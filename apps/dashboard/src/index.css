@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --surface-base: #0B0D11;
+    --surface-card: #111318;
+    --surface-elevated: #181B22;
+    --surface-border: #1F2330;
+    --brand: #FF5500;
+  }
+
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface-base); }
+  ::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2E3448; }
+}
+
+@layer components {
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+  .status-scheduled { @apply status-pill bg-blue-500/10 text-blue-400; }
+  .status-en_route  { @apply status-pill bg-amber-500/10 text-amber-400; }
+  .status-in_progress { @apply status-pill bg-violet-500/10 text-violet-400; }
+  .status-complete  { @apply status-pill bg-emerald-500/10 text-emerald-400; }
+  .status-cancelled { @apply status-pill bg-gray-500/10 text-gray-500; }
+
+  .nav-item {
+    @apply flex items-center gap-3 rounded px-3 py-2.5 text-sm text-gray-400
+      hover:bg-surface-elevated hover:text-gray-100 transition-colors duration-150;
+  }
+  .nav-item-active {
+    @apply nav-item bg-surface-elevated text-gray-100;
+  }
+  .card {
+    @apply rounded border border-surface-border bg-surface-card;
+  }
+}

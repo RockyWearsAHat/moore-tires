@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base styles ─────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-onyx-900 text-platinum-100 font-body;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(255, 85, 0, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(255, 85, 0, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-flame-500/30 text-platinum-50;
+  }
+}
+
+/* ── Typography utilities ────────────────────────────────────────────────────── */
+@layer components {
+  .display-xl {
+    @apply font-display text-[clamp(4rem,12vw,10rem)] font-black leading-[0.88] tracking-tight uppercase;
+  }
+
+  .display-lg {
+    @apply font-display text-[clamp(2.5rem,7vw,5.5rem)] font-extrabold leading-[0.9] tracking-tight uppercase;
+  }
+
+  .display-md {
+    @apply font-display text-[clamp(1.75rem,4vw,3rem)] font-bold leading-tight uppercase;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold tracking-[0.25em] uppercase text-flame-500;
+  }
+
+  .body-lg {
+    @apply text-base leading-relaxed text-platinum-400 md:text-lg;
+  }
+}
+
+/* ── Flame accent line ────────────────────────────────────────────────────────── */
+@layer components {
+  .accent-line {
+    @apply block h-0.5 bg-flame-500 origin-left;
+  }
+
+  .flame-btn {
+    @apply inline-flex items-center gap-3 bg-flame-500 hover:bg-flame-600 active:bg-flame-700
+           text-white font-display font-bold uppercase tracking-widest
+           px-8 py-4 text-base transition-all duration-200
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-flame-400
+           focus-visible:ring-offset-4 focus-visible:ring-offset-onyx-900;
+  }
+
+  .ghost-btn {
+    @apply inline-flex items-center gap-3 border border-platinum-400/30
+           hover:border-flame-500 text-platinum-200 hover:text-flame-400
+           font-display font-bold uppercase tracking-widest
+           px-8 py-4 text-base transition-all duration-200;
+  }
+}
+
+/* ── Tread texture ────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .tread-overlay {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255, 85, 0, 0.03) 0px,
+      rgba(255, 85, 0, 0.03) 2px,
+      transparent 2px,
+      transparent 40px
+    );
+  }
+}
+
+/* ── Scroll reveal animation state ────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

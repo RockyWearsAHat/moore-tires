@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+build
+.turbo
+coverage
+
+# Expo
+.expo
+android
+ios
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+playwright-report
+test-results
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Temporary
+*.tmp
+*.temp
