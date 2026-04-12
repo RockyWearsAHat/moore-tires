@@ -2,7 +2,7 @@ import { Router } from 'express';
 import twilio from 'twilio';
 import { Customer } from '@moore-tires/db';
 
-export const webhooksRouter = Router();
+export const webhooksRouter: Router = Router();
 
 /**
  * POST /api/v1/webhooks/twilio/opt-out

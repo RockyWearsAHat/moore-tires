@@ -33,7 +33,7 @@ export default function JobsScreen() {
     const technicianId = 'me'; // Replace with real auth-based tech ID
     void (async () => {
       try {
-        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL ?? ''}/api/v1/jobs/technician/${technicianId}`);
+        const res = await fetch(`${process.env['EXPO_PUBLIC_API_URL'] ?? ''}/api/v1/jobs/technician/${technicianId}`);
         if (!res.ok) return;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { data } = await res.json();

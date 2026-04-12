@@ -13,7 +13,7 @@ import {
 } from '../services/job.service.js';
 import { AppError } from '../errors.js';
 
-export const jobsRouter = Router();
+export const jobsRouter: Router = Router();
 
 /**
  * POST /api/v1/jobs

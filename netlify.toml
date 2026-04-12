@@ -1,0 +1,29 @@
+[build]
+  base    = "apps/marketing"
+  command = "pnpm --filter marketing build"
+  publish = "apps/marketing/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "9"
+
+# SPA fallback — all routes served by index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# API proxy — forward /api/* to the deployed API server
+# Replace VITE_API_URL with your actual Render / Railway / Fly URL
+# in the Netlify environment variable settings.
+[[redirects]]
+  from   = "/api/*"
+  to     = ":VITE_API_URL/api/:splat"
+  status = 200
+  force  = true
+
+[context.production.environment]
+  VITE_API_URL = "https://api.moore-tires.example.com"
+
+[context.deploy-preview.environment]
+  VITE_API_URL = "https://api-staging.moore-tires.example.com"

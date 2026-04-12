@@ -52,7 +52,7 @@ export default function JobDetailScreen() {
   useEffect(() => {
     void (async () => {
       try {
-        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL ?? ''}/api/v1/jobs/${id ?? ''}`);
+        const res = await fetch(`${process.env['EXPO_PUBLIC_API_URL'] ?? ''}/api/v1/jobs/${id ?? ''}`);
         if (!res.ok) return;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { data } = await res.json();
@@ -68,7 +68,7 @@ export default function JobDetailScreen() {
     const next = NEXT_STATUS[job.status]!;
     setUpdating(true);
     try {
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL ?? ''}/api/v1/jobs/${job.id}/status`, {
+      const res = await fetch(`${process.env['EXPO_PUBLIC_API_URL'] ?? ''}/api/v1/jobs/${job.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next }),

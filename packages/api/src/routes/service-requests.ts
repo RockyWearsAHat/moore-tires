@@ -8,7 +8,7 @@ import {
 import { intakeRateLimit } from '../middleware/rate-limit.js';
 import { AppError } from '../errors.js';
 
-export const serviceRequestsRouter = Router();
+export const serviceRequestsRouter: Router = Router();
 
 /**
  * POST /api/v1/service-requests

@@ -55,7 +55,7 @@ export default function BookScreen() {
     setState('submitting');
     setApiError(undefined);
     try {
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL ?? ''}/api/v1/service-requests`, {
+      const res = await fetch(`${process.env['EXPO_PUBLIC_API_URL'] ?? ''}/api/v1/service-requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
