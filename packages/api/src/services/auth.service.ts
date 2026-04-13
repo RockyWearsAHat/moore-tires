@@ -186,7 +186,7 @@ export async function logoutAll(userId: string): Promise<void> {
  * Admin-only: create a user with a specific role and account linkage.
  * Generates a temporary password that the invitee must change on first login.
  */
-export async function inviteUser(input: InviteUserInput): Promise<AuthUser> {
+export async function inviteUser(input: InviteUserInput): Promise<AuthUser & { tempPassword: string }> {
   const existing = await User.findOne({ email: input.email.toLowerCase() });
   if (existing) {
     throw AppError.conflict('A user with this email already exists');
@@ -221,6 +221,45 @@ export async function inviteUser(input: InviteUserInput): Promise<AuthUser> {
   const authUser = buildAuthUser(user);
   // Attach temp password to response so admin can share it
   return { ...authUser, tempPassword } as AuthUser & { tempPassword: string };
+}
+
+/**
+ * Admin-only: list users with optional filtering by role and account.
+ */
+export async function listUsers(filters: {
+  role?: string;
+  wholesaleAccountId?: string;
+  isActive?: boolean;
+}): Promise<AuthUser[]> {
+  const query: Record<string, unknown> = {};
+  if (filters.role) query['role'] = filters.role;
+  if (filters.wholesaleAccountId) query['wholesaleAccountId'] = filters.wholesaleAccountId;
+  if (filters.isActive !== undefined) query['isActive'] = filters.isActive;
+
+  const users = await User.find(query).sort({ createdAt: -1 }).lean();
+  return users.map((u) => ({
+    id: u._id?.toString() ?? '',
+    email: u.email,
+    firstName: u.firstName,
+    lastName: u.lastName,
+    role: u.role,
+    wholesaleAccountId: u.wholesaleAccountId?.toString(),
+    storeLocationId: u.storeLocationId?.toString(),
+  }));
+}
+
+/**
+ * Admin-only: deactivate a user account (zero-trust revocation).
+ * Also purges all refresh tokens so they cannot re-authenticate.
+ */
+export async function deactivateUser(userId: string): Promise<void> {
+  const user = await User.findById(userId);
+  if (!user) throw AppError.notFound('User not found');
+  if (user.role === 'admin') throw AppError.forbidden('Cannot deactivate an admin account');
+
+  user.isActive = false;
+  await user.save();
+  await RefreshToken.deleteMany({ userId });
 }
 
 /**

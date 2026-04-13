@@ -15,6 +15,7 @@ import { initSocket } from './socket.js';
 import { startSmsWorker } from './workers/sms.worker.js';
 import { startPushWorker } from './workers/push.worker.js';
 import { errorHandler } from './middleware/error.js';
+import { strictSanitize } from './middleware/sanitize.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -41,6 +42,7 @@ app.use(
 // Raw body needed for Twilio webhook signature validation
 app.use('/api/v1/webhooks', express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '1mb' }));
+app.use(strictSanitize);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

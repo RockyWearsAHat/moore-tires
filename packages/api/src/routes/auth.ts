@@ -16,12 +16,15 @@ import {
   inviteUser,
   getProfile,
   changePassword,
+  listUsers,
+  deactivateUser,
   createWholesaleAccount,
   listWholesaleAccounts,
   getWholesaleAccountById,
   createStoreLocation,
   listStoreLocations,
 } from '../services/auth.service.js';
+import { sendInviteEmail } from '../services/notification.service.js';
 import { loginRateLimit } from '../middleware/rate-limit.js';
 import { AppError } from '../errors.js';
 
@@ -144,6 +147,7 @@ authRouter.post('/change-password', requireAuth, async (req, res, next) => {
 /**
  * POST /api/v1/auth/invite
  * Auth: admin — invite a new user with a specific role.
+ * Sends an invitation email with a temporary password.
  */
 authRouter.post('/invite', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
@@ -151,12 +155,59 @@ authRouter.post('/invite', requireAuth, requireRole('admin'), async (req, res, n
     if (!result.success) {
       throw AppError.badRequest('Validation failed', result.error.flatten());
     }
+    const { userId } = getAuthUser(req);
     const data = await inviteUser(result.data);
+    const inviterProfile = await getProfile(userId);
+    const inviterName = `${inviterProfile.firstName} ${inviterProfile.lastName}`;
+
+    // Send invite email (fire-and-forget — don't block response on email delivery)
+    if (data.tempPassword) {
+      sendInviteEmail(data.email, inviterName, data.tempPassword, data.role).catch((err) =>
+        console.error('[notifications] Failed to send invite email:', err)
+      );
+    }
+
     res.status(201).json({ success: true, data });
   } catch (err) {
     next(err);
   }
 });
+
+/**
+ * GET /api/v1/auth/users
+ * Auth: admin — list all users with optional filtering.
+ */
+authRouter.get('/users', requireAuth, requireRole('admin'), async (req, res, next) => {
+  try {
+    const filters = {
+      role: req.query['role'] ? String(req.query['role']) : undefined,
+      wholesaleAccountId: req.query['accountId'] ? String(req.query['accountId']) : undefined,
+      isActive: req.query['active'] !== undefined ? req.query['active'] === 'true' : undefined,
+    };
+    const data = await listUsers(filters);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/v1/auth/users/:id/deactivate
+ * Auth: admin — deactivate a user account. Zero-trust revocation.
+ */
+authRouter.post(
+  '/users/:id/deactivate',
+  requireAuth,
+  requireRole('admin'),
+  async (req, res, next) => {
+    try {
+      await deactivateUser(String(req.params['id'] ?? ''));
+      res.json({ success: true, data: { message: 'User deactivated' } });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 // ─── Wholesale Account Routes (Admin) ─────────────────────────────────────────
 
