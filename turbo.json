@@ -23,6 +23,7 @@
       "persistent": false
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
