@@ -1,6 +1,6 @@
 [build]
-  base    = "apps/marketing"
-  command = "pnpm --filter marketing build"
+  base    = "."
+  command = "pnpm turbo run build --filter=marketing..."
   publish = "apps/marketing/dist"
 
 [build.environment]
