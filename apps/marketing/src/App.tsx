@@ -6,6 +6,10 @@ import { Services } from './pages/Services.js';
 import { About } from './pages/About.js';
 import { Contact } from './pages/Contact.js';
 import { Book } from './pages/Book.js';
+import Login from './pages/Login.js';
+import Register from './pages/Register.js';
+import Tires from './pages/Tires.js';
+import Cart from './pages/Cart.js';
 
 export function App() {
   return (
@@ -18,6 +22,10 @@ export function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/book" element={<Book />} />
+          <Route path="/tires" element={<Tires />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </main>
       <Footer />

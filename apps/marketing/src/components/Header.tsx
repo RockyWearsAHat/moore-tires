@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.js';
+import { useCart } from '../context/CartContext.js';
 
 const NAV_LINKS = [
+  { to: '/tires', label: 'Shop Tires' },
   { to: '/services', label: 'Services' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
@@ -10,6 +13,8 @@ const NAV_LINKS = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const { itemCount } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -60,8 +65,46 @@ export function Header() {
           ))}
         </nav>
 
-        {/* CTA + mobile menu */}
-        <div className="flex items-center gap-4">
+        {/* CTA + Cart + Auth + mobile menu */}
+        <div className="flex items-center gap-3">
+          {/* Cart icon */}
+          <Link
+            to="/cart"
+            className="relative flex h-10 w-10 items-center justify-center rounded-lg text-platinum-400 transition hover:text-platinum-50"
+            aria-label="Shopping cart"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-flame-500 text-[10px] font-bold text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Auth */}
+          {user ? (
+            <div className="hidden items-center gap-3 md:flex">
+              <span className="text-sm text-platinum-400">
+                {user.firstName}
+              </span>
+              <button
+                onClick={() => logout()}
+                className="ghost-btn text-sm"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="ghost-btn hidden text-sm md:inline-flex"
+            >
+              Sign In
+            </Link>
+          )}
+
           <Link
             to="/book"
             className="flame-btn hidden text-sm md:inline-flex"
@@ -113,6 +156,25 @@ export function Header() {
             >
               Book Now
             </Link>
+            {user ? (
+              <button
+                onClick={() => {
+                  logout();
+                  setMenuOpen(false);
+                }}
+                className="ghost-btn mt-2 w-full justify-center"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="ghost-btn mt-2 block text-center"
+              >
+                Sign In
+              </Link>
+            )}
           </nav>
         </div>
       )}
