@@ -9,6 +9,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "dev:web": "turbo run build --filter=@moore-tires/shared --filter=@moore-tires/db --filter=@moore-tires/ui && turbo run dev --filter=marketing --parallel",
+    "dev:dash": "turbo run build --filter=@moore-tires/shared --filter=@moore-tires/db --filter=@moore-tires/ui && turbo run dev --filter=dashboard --parallel",
+    "dev:mobile": "turbo run build --filter=@moore-tires/shared && pnpm --filter mobile start",
+    "dev:api": "turbo run build --filter=@moore-tires/shared --filter=@moore-tires/db && pnpm --filter @moore-tires/api dev",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
