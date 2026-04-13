@@ -15,6 +15,7 @@ const VehicleSchema = new Schema<IVehicle>(
   {
     customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
     year: { type: Number, required: true },
+    make: { type: String, required: true, trim: true, maxlength: 50 },
     vehicleModel: { type: String, required: true, trim: true, maxlength: 50 },
     licensePlate: { type: String, required: true, trim: true, uppercase: true, maxlength: 20 },
   },

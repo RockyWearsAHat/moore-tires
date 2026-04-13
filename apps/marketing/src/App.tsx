@@ -10,6 +10,7 @@ import Login from './pages/Login.js';
 import Register from './pages/Register.js';
 import Tires from './pages/Tires.js';
 import Cart from './pages/Cart.js';
+import Checkout from './pages/Checkout.js';
 
 export function App() {
   return (
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/book" element={<Book />} />
           <Route path="/tires" element={<Tires />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

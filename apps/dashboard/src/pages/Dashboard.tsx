@@ -88,7 +88,7 @@ function useSocket() {
 }
 
 export function DashboardPage() {
-  const { connected } = useSocket();
+  const { socket, connected } = useSocket();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
@@ -109,6 +109,29 @@ export function DashboardPage() {
       }
     })();
   }, []);
+
+  // Wire socket event listeners for real-time updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStatusChange = (payload: { jobId: string; status: JobStatus }) => {
+      setJobs((prev) =>
+        prev.map((j) => (j.id === payload.jobId ? { ...j, status: payload.status } : j))
+      );
+    };
+
+    const handleDispatchRefresh = (payload: Job[]) => {
+      setJobs(payload);
+    };
+
+    socket.on('job:status_changed' as keyof SocketEvents, handleStatusChange as never);
+    socket.on('dispatch:today' as keyof SocketEvents, handleDispatchRefresh as never);
+
+    return () => {
+      socket.off('job:status_changed' as keyof SocketEvents, handleStatusChange as never);
+      socket.off('dispatch:today' as keyof SocketEvents, handleDispatchRefresh as never);
+    };
+  }, [socket]);
 
   const updateStatus = async (jobId: string, newStatus: JobStatus) => {
     setUpdatingId(jobId);

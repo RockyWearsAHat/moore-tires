@@ -20,19 +20,48 @@ export function InboxPage() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadRequests = async () => {
+    try {
+      const res = await fetch('/api/v1/service-requests?status=PENDING');
+      if (!res.ok) return;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { data } = await res.json();
+      setRequests(data as ServiceRequest[]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    void (async () => {
-      try {
-        const res = await fetch('/api/v1/service-requests?status=PENDING');
-        if (!res.ok) return;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const { data } = await res.json();
-        setRequests(data as ServiceRequest[]);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    void loadRequests();
   }, []);
+
+  const scheduleRequest = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/jobs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceRequestId: id }),
+      });
+      if (res.ok) setRequests((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      // Error handling
+    }
+  };
+
+  const dismissRequest = async (id: string) => {
+    try {
+      // Mark the service request as cancelled
+      await fetch(`/api/v1/service-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CANCELLED' }),
+      });
+      setRequests((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      // Error handling
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -83,12 +112,14 @@ export function InboxPage() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    onClick={() => void scheduleRequest(req.id)}
                     className="rounded bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-400 transition-colors"
                   >
                     Schedule
                   </button>
                   <button
                     type="button"
+                    onClick={() => void dismissRequest(req.id)}
                     className="rounded border border-surface-border px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-gray-100 transition-colors"
                   >
                     Dismiss

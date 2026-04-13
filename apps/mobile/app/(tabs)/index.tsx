@@ -1,44 +1,61 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { useMobileAuth } from '../../src/context/AuthContext';
 import { colors, spacing, typography } from '../../src/theme';
 
 const SERVICES = [
-  { icon: '⚙', title: 'Install', desc: 'Mount & balance new tires.' },
-  { icon: '◎', title: 'Repair', desc: 'Fast flat patch & plug.' },
-  { icon: '↺', title: 'Rotation', desc: 'Even wear, longer life.' },
-  { icon: '◈', title: 'Inspection', desc: '20-point tire health check.' },
+  { icon: '🛞', title: 'Wholesale', desc: 'Bulk tire ordering for fleets.' },
+  { icon: '📦', title: 'Quick Order', desc: 'Reorder from your history.' },
+  { icon: '📊', title: 'Inventory', desc: 'Track stock, get low alerts.' },
+  { icon: '🚚', title: 'Delivery', desc: 'Fast shipping from WA hub.' },
 ];
 
 export default function HomeScreen() {
+  const { user } = useMobileAuth();
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Hero */}
       <View style={styles.hero}>
-        <Text style={styles.label}>Professional Tire Service</Text>
+        <Text style={styles.label}>Wholesale Tire Distribution</Text>
         <Text style={styles.headline}>
-          Gripped.{'\n'}
-          <Text style={{ color: colors.flame[500] }}>Every</Text> Road.
+          Moore{'\n'}
+          <Text style={{ color: colors.flame[500] }}>Tires</Text>
         </Text>
         <Text style={styles.subhead}>
-          Expert installation, repair, rotation & inspection. Mobile service available.
+          Wholesale semi-truck tires for fleets. TA, Love's, and independent dealers. Fast delivery from our Washington distribution center.
         </Text>
+
+        {user ? (
+          <TouchableOpacity
+            style={styles.ctaBtn}
+            onPress={() => router.push('/(tabs)/tires')}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Shop Tires"
+          >
+            <Text style={styles.ctaText}>Shop Tires</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.ctaBtn}
+            onPress={() => router.push('/login')}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Sign in to order"
+          >
+            <Text style={styles.ctaText}>Sign In to Order</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
-          style={styles.ctaBtn}
+          style={styles.callBtn}
           onPress={() => router.push('/book')}
           activeOpacity={0.85}
           accessibilityRole="button"
-          accessibilityLabel="Book appointment"
+          accessibilityLabel="Book service"
         >
-          <Text style={styles.ctaText}>Book Appointment</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.callBtn}
-          onPress={() => {/* Linking.openURL('tel:+15558675309') */}}
-          activeOpacity={0.85}
-          accessibilityRole="button"
-          accessibilityLabel="Call us"
-        >
-          <Text style={styles.callText}>Call (555) 867-5309</Text>
+          <Text style={styles.callText}>Book Service</Text>
         </TouchableOpacity>
       </View>
 

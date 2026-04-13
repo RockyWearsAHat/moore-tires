@@ -9,6 +9,8 @@ import { OrdersPage } from './pages/Orders';
 import { ProductsPage } from './pages/Products';
 import { CompaniesPage } from './pages/Companies';
 import { UsersPage } from './pages/Users';
+import { InventoryPage } from './pages/Inventory';
+import { DistributionCentersPage } from './pages/DistributionCenters';
 
 export function App() {
   return (
@@ -22,6 +24,15 @@ export function App() {
               <Route path="orders"    element={<OrdersPage />} />
               <Route path="products"  element={<ProductsPage />} />
               <Route path="companies" element={<CompaniesPage />} />
+              <Route path="inventory" element={<InventoryPage />} />
+              <Route
+                path="centers"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <DistributionCentersPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="users"
                 element={

@@ -140,9 +140,9 @@ export default function Cart() {
 
         <div className="mt-6 space-y-3">
           {user ? (
-            <button className="flame-btn w-full">
+            <Link to="/checkout" className="flame-btn block w-full text-center">
               Proceed to Checkout
-            </button>
+            </Link>
           ) : (
             <div className="space-y-2">
               <Link to="/login" className="flame-btn block w-full text-center">

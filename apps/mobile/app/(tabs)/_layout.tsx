@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
-  const icons: Record<string, string> = { Home: '◌', Jobs: '◈', Book: '+' };
+  const icons: Record<string, string> = { Home: '◌', Jobs: '◈', Tires: '◎', Book: '+', Account: '⚙' };
   return (
     <Text style={{ fontSize: 18, color: focused ? '#FF5500' : '#6B6860' }}>
       {icons[label] ?? '○'}
@@ -27,12 +27,20 @@ export default function TabLayout() {
         options={{ title: 'Home', tabBarIcon: ({ focused }) => <TabIcon label="Home" focused={focused} /> }}
       />
       <Tabs.Screen
+        name="tires"
+        options={{ title: 'Tires', tabBarIcon: ({ focused }) => <TabIcon label="Tires" focused={focused} /> }}
+      />
+      <Tabs.Screen
         name="jobs"
         options={{ title: 'My Jobs', tabBarIcon: ({ focused }) => <TabIcon label="Jobs" focused={focused} /> }}
       />
       <Tabs.Screen
         name="book"
         options={{ title: 'Book', tabBarIcon: ({ focused }) => <TabIcon label="Book" focused={focused} /> }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{ title: 'Account', tabBarIcon: ({ focused }) => <TabIcon label="Account" focused={focused} /> }}
       />
     </Tabs>
   );
