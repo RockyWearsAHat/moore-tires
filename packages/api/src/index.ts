@@ -4,6 +4,10 @@ import { createServer } from 'node:http';
 import cors from 'cors';
 import helmet from 'helmet';
 import { connectDb } from '@moore-tires/db';
+import { authRouter } from './routes/auth.js';
+import { productsRouter } from './routes/products.js';
+import { ordersRouter } from './routes/orders.js';
+import { inventoryRouter } from './routes/inventory.js';
 import { serviceRequestsRouter } from './routes/service-requests.js';
 import { jobsRouter } from './routes/jobs.js';
 import { webhooksRouter } from './routes/webhooks.js';
@@ -44,6 +48,10 @@ app.get('/health', (_req, res) => {
 });
 
 // ── API routes ────────────────────────────────────────────────────────────────
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/products', productsRouter);
+app.use('/api/v1/orders', ordersRouter);
+app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/service-requests', serviceRequestsRouter);
 app.use('/api/v1/jobs', jobsRouter);
 app.use('/api/v1/webhooks', webhooksRouter);

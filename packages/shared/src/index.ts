@@ -202,3 +202,270 @@ export interface PushJobReassignedPayload {
   expoPushToken: string;
   jobId: string;
 }
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+export const UserRoleSchema = z.enum([
+  'admin',
+  'district_manager',
+  'store_employee',
+  'retail_customer',
+]);
+export type UserRole = z.infer<typeof UserRoleSchema>;
+
+export const PaymentTermsSchema = z.enum(['PREPAID', 'NET_15', 'NET_30']);
+export type PaymentTerms = z.infer<typeof PaymentTermsSchema>;
+
+export const RegisterSchema = z.object({
+  email: z.string().email().max(255),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .max(128),
+  firstName: z.string().min(1).max(50).trim(),
+  lastName: z.string().min(1).max(50).trim(),
+  phone: PhoneSchema.optional(),
+});
+export type RegisterInput = z.infer<typeof RegisterSchema>;
+
+export const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+export type LoginInput = z.infer<typeof LoginSchema>;
+
+export const RefreshTokenRequestSchema = z.object({
+  refreshToken: z.string().min(1),
+});
+export type RefreshTokenRequestInput = z.infer<typeof RefreshTokenRequestSchema>;
+
+export const InviteUserSchema = z
+  .object({
+    email: z.string().email().max(255),
+    firstName: z.string().min(1).max(50).trim(),
+    lastName: z.string().min(1).max(50).trim(),
+    role: UserRoleSchema,
+    wholesaleAccountId: z.string().optional(),
+    storeLocationId: z.string().optional(),
+    phone: PhoneSchema.optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.role === 'district_manager' && !data.wholesaleAccountId) return false;
+      if (data.role === 'store_employee' && (!data.wholesaleAccountId || !data.storeLocationId))
+        return false;
+      return true;
+    },
+    {
+      message:
+        'District managers require wholesaleAccountId; store employees require both wholesaleAccountId and storeLocationId',
+    }
+  );
+export type InviteUserInput = z.infer<typeof InviteUserSchema>;
+
+export const CreateWholesaleAccountSchema = z.object({
+  companyName: z.string().min(1).max(200).trim(),
+  contactEmail: z.string().email().max(255),
+  contactPhone: PhoneSchema,
+  paymentTerms: PaymentTermsSchema.default('PREPAID'),
+  billingAddress: z.object({
+    street: z.string().min(1).max(200),
+    city: z.string().min(1).max(100),
+    state: z.string().min(2).max(2),
+    zip: z.string().regex(/^\d{5}(-\d{4})?$/, 'ZIP must be 5 or 9 digits'),
+  }),
+});
+export type CreateWholesaleAccountInput = z.infer<typeof CreateWholesaleAccountSchema>;
+
+export const CreateStoreLocationSchema = z.object({
+  wholesaleAccountId: z.string().min(1),
+  name: z.string().min(1).max(200).trim(),
+  address: z.string().min(1).max(200),
+  city: z.string().min(1).max(100),
+  state: z.string().min(2).max(2),
+  zip: z.string().regex(/^\d{5}(-\d{4})?$/, 'ZIP must be 5 or 9 digits'),
+  contactPhone: PhoneSchema.optional(),
+});
+export type CreateStoreLocationInput = z.infer<typeof CreateStoreLocationSchema>;
+
+// ─── Auth Response Types ──────────────────────────────────────────────────────
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  wholesaleAccountId?: string;
+  storeLocationId?: string;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  tokens: AuthTokens;
+}
+
+/** Payload embedded in JWT access tokens — available on every authenticated request. */
+export interface JwtPayload {
+  userId: string;
+  email: string;
+  role: UserRole;
+  wholesaleAccountId?: string;
+  storeLocationId?: string;
+}
+
+// ─── Tire Product ─────────────────────────────────────────────────────────────
+
+export const TireTypeSchema = z.enum([
+  'COMMERCIAL',
+  'ALL_SEASON',
+  'ALL_TERRAIN',
+  'HIGHWAY',
+  'MUD_TERRAIN',
+  'WINTER',
+]);
+export type TireType = z.infer<typeof TireTypeSchema>;
+
+export const CreateTireProductSchema = z.object({
+  brand: z.string().min(1).max(100).trim(),
+  tireModel: z.string().min(1).max(100).trim(),
+  size: z.object({
+    width: z.number().positive(),
+    aspectRatio: z.number().min(0),
+    rimDiameter: z.number().positive(),
+    construction: z.string().default('R'),
+  }),
+  formattedSize: z.string().min(1).max(50),
+  type: TireTypeSchema,
+  loadIndex: z.string().max(10).default(''),
+  speedRating: z.string().max(5).default(''),
+  plyRating: z.number().positive().optional(),
+  weight: z.number().positive().optional(),
+  description: z.string().max(2000).optional(),
+  images: z.array(z.string().url()).default([]),
+  specifications: z.record(z.string()).default({}),
+  baseRetailPrice: z.number().positive(),
+});
+export type CreateTireProductInput = z.infer<typeof CreateTireProductSchema>;
+
+export const TireProductSearchSchema = z.object({
+  type: TireTypeSchema.optional(),
+  brand: z.string().optional(),
+  size: z.string().optional(),
+  minPrice: z.coerce.number().min(0).optional(),
+  maxPrice: z.coerce.number().min(0).optional(),
+  search: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+export type TireProductSearchInput = z.infer<typeof TireProductSearchSchema>;
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
+
+export const CreatePricingTierSchema = z.object({
+  name: z.string().min(1).max(100).trim(),
+  defaultDiscountPercent: z.number().min(0).max(100),
+  description: z.string().max(500).optional(),
+});
+export type CreatePricingTierInput = z.infer<typeof CreatePricingTierSchema>;
+
+export const CreatePriceOverrideSchema = z.object({
+  tierId: z.string().min(1),
+  productId: z.string().min(1),
+  overridePrice: z.number().min(0),
+});
+export type CreatePriceOverrideInput = z.infer<typeof CreatePriceOverrideSchema>;
+
+/** Calculate effective price for a product given a tier. */
+export function calculateTierPrice(
+  baseRetailPrice: number,
+  discountPercent: number,
+  overridePrice?: number
+): number {
+  if (overridePrice !== undefined) return overridePrice;
+  return Math.round(baseRetailPrice * (1 - discountPercent / 100) * 100) / 100;
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+export const OrderStatusSchema = z.enum([
+  'CART',
+  'SUBMITTED',
+  'CONFIRMED',
+  'PROCESSING',
+  'SHIPPED',
+  'DELIVERED',
+  'CANCELLED',
+]);
+export type OrderStatusType = z.infer<typeof OrderStatusSchema>;
+
+export const PaymentMethodSchema = z.enum(['CARD', 'ACH', 'INVOICE']);
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
+
+export const CreateOrderItemSchema = z.object({
+  productId: z.string().min(1),
+  quantity: z.number().int().positive(),
+});
+
+export const CreateOrderSchema = z.object({
+  items: z.array(CreateOrderItemSchema).min(1),
+  shippingAddress: z.object({
+    street: z.string().min(1).max(200),
+    city: z.string().min(1).max(100),
+    state: z.string().min(2).max(2),
+    zip: z.string().regex(/^\d{5}(-\d{4})?$/),
+  }),
+  paymentMethod: PaymentMethodSchema.default('CARD'),
+  notes: z.string().max(1000).optional(),
+});
+export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
+
+export const UpdateOrderStatusSchema = z.object({
+  status: OrderStatusSchema,
+  trackingNumber: z.string().optional(),
+  notes: z.string().max(1000).optional(),
+});
+export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
+
+// ─── Inventory ────────────────────────────────────────────────────────────────
+
+export const InventoryItemSchema = z.object({
+  productId: z.string().min(1),
+  currentQuantity: z.number().int().min(0),
+  reorderThreshold: z.number().int().min(0),
+  targetQuantity: z.number().int().min(0),
+  autoReorder: z.boolean().default(false),
+});
+
+export const InventoryUploadSchema = z.object({
+  items: z.array(InventoryItemSchema).min(1),
+});
+export type InventoryUploadInput = z.infer<typeof InventoryUploadSchema>;
+
+export const UpdateInventoryItemSchema = z.object({
+  currentQuantity: z.number().int().min(0).optional(),
+  reorderThreshold: z.number().int().min(0).optional(),
+  targetQuantity: z.number().int().min(0).optional(),
+  autoReorder: z.boolean().optional(),
+});
+export type UpdateInventoryItemInput = z.infer<typeof UpdateInventoryItemSchema>;
+
+// ─── Delivery ETA ─────────────────────────────────────────────────────────────
+
+export const DeliveryEstimateRequestSchema = z.object({
+  zip: z.string().regex(/^\d{5}(-\d{4})?$/),
+  distributionCenter: z.string().default('WA'),
+});
+export type DeliveryEstimateRequest = z.infer<typeof DeliveryEstimateRequestSchema>;
+
+export interface DeliveryEstimate {
+  minDays: number;
+  maxDays: number;
+  estimatedDate: string;
+  distributionCenter: string;
+}

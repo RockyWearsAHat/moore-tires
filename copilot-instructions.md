@@ -1,9 +1,9 @@
 # Moore Tires — Copilot Instructions
 
 ## Project Purpose
-Moore Tires is a tire-service business platform split into two distinct surfaces:
-- **Operational App** — cross-platform mobile + web dashboard for technicians, dispatchers, and managers (scheduling, dispatch, service intake, customer communication).
-- **Marketing Website** — Vite + React 18 static site for lead generation, appointment booking funnel, and SEO.
+Moore Tires is a wholesale tire distribution platform with supporting service operations, split into two distinct surfaces:
+- **Operational App** — cross-platform mobile + web dashboard for buyers, store employees, dispatchers, managers, and Moore Tire staff handling ordering, inventory workflows, fulfillment, and service operations.
+- **Marketing Website** — Vite + React 18 site for lead generation, account onboarding, wholesale ordering discovery, and secondary appointment booking.
 
 Both surfaces share a single backend API and MongoDB database.
 
@@ -31,7 +31,7 @@ moore-tires/
 | Marketing | Vite + React 18 (static build) | Static HTML via Netlify; Lighthouse ≥ 90 |
 | API | Node.js 20, Express 5, Zod | Type-safe validation at boundary |
 | ORM / DB | Mongoose 8 + MongoDB Atlas | Document model; Firebase optional for auth/notifications/analytics |
-| Auth | Clerk | Mobile + web unified sessions |
+| Auth | Custom JWT (bcrypt + jsonwebtoken) | Own DB, real B2B accounts, no vendor dependency |
 | Real-time | Socket.io 4 | Dispatch board live updates |
 | SMS/Voice | Twilio | Customer notifications, appointment reminders |
 | Push | Expo Push + FCM | Technician job alerts |
@@ -95,12 +95,15 @@ pnpm lint           # eslint + tsc --noEmit across all packages
 ```
 
 ## Key Domain Concepts
-- **ServiceRequest** — a customer-initiated request for tire service (install, repair, inspection).
-- **Job** — an accepted ServiceRequest assigned to a technician with a scheduled time slot.
-- **Dispatch** — real-time assignment of Jobs to technicians; managed on the dispatch board.
-- **Appointment** — a time slot reserved for a Job at a shop or mobile location.
-- **Customer** — end-user with contact info, vehicle records, and service history.
-- **Technician** — employee with skills, availability, and assigned territory.
+- **WholesaleAccount** — a commercial buyer or chain account with negotiated pricing, one or more locations, and linked district managers or store users.
+- **StoreLocation** — a customer location operating under a larger wholesale account.
+- **ServiceRequest** — a customer-initiated request for tire service (install, repair, inspection) used when the service workflow is active.
+- **Order** — a tire purchase request placed by a wholesale customer, district manager, or authorized store user.
+- **InventorySubmission** — customer- or store-provided inventory data used for replenishment and low-stock workflows.
+- **Job** — an accepted service request or operational task assigned to staff with a scheduled time slot.
+- **Appointment** — a time slot reserved for a service job at a shop or mobile location.
+- **Customer** — an end-user or business contact associated with service history, ordering, or account activity.
+- **Technician** — employee with skills, availability, assigned territory, or operational responsibilities.
 
 ## Constraints
 - Phone support is mandatory on all customer-facing flows; no desktop-only UX.
