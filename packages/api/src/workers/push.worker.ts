@@ -16,6 +16,7 @@ function isPushJobAssigned(p: PushPayload): p is PushJobAssignedPayload {
 }
 
 export function startPushWorker(): void {
+  if (!redis) return;
   const worker = new Worker<PushPayload>(
     'push:job',
     async (job) => {

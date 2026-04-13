@@ -35,6 +35,7 @@ function buildMessage(templateId: string, variables: Record<string, string>): st
 }
 
 export function startSmsWorker(): void {
+  if (!redis) return;
   const worker = new Worker<SmsSendPayload>(
     'sms:send',
     async (job) => {

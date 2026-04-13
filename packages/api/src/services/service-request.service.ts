@@ -83,7 +83,7 @@ export async function createServiceRequest(input: CreateServiceRequestInput) {
 
   // ── 5. Enqueue SMS confirmation ────────────────────────────────────────────
   const firstName = input.fullName.split(' ')[0] ?? input.fullName;
-  await smsQueue.add('sms:send', {
+  await smsQueue?.add('sms:send', {
     to: input.phone,
     templateId: SMS_TEMPLATES.sms_receipt,
     variables: {

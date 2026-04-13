@@ -80,7 +80,7 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
     // ── Post-transaction: notifications ────────────────────────────────────
     const technician = await Technician.findById(technicianId).lean();
     if (technician?.expoPushToken) {
-      await pushQueue.add('push:job_assigned', {
+      await pushQueue?.add('push:job_assigned', {
         expoPushToken: technician.expoPushToken,
         jobId: String(job._id),
         address: 'See job details',
@@ -95,7 +95,7 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
 
     if (sr?.customerId && typeof sr.customerId !== 'string') {
       const firstName = technician?.fullName.split(' ')[0] ?? '';
-      await smsQueue.add('sms:send', {
+      await smsQueue?.add('sms:send', {
         to: sr.customerId.phone,
         templateId: SMS_TEMPLATES.sms_confirmed,
         variables: {
@@ -106,7 +106,7 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
     }
 
     // Reminder jobs — store BullMQ jobId on Appointment for cancellation (AC-18)
-    const reminder24h = await reminderQueue.add(
+    const reminder24h = await reminderQueue?.add(
       'sms:reminder',
       {
         to: sr?.customerId && typeof sr.customerId !== 'string' ? sr.customerId.phone : '',
@@ -115,7 +115,7 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
       },
       { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 24 * 60 * 60 * 1000) }
     );
-    const reminder2h = await reminderQueue.add(
+    const reminder2h = await reminderQueue?.add(
       'sms:reminder',
       {
         to: sr?.customerId && typeof sr.customerId !== 'string' ? sr.customerId.phone : '',
@@ -124,13 +124,15 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
       },
       { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 2 * 60 * 60 * 1000) }
     );
-    await Appointment.findOneAndUpdate(
-      { jobId: job._id },
-      {
-        reminderJobId24h: reminder24h.id,
-        reminderJobId2h: reminder2h.id,
-      }
-    );
+    if (reminder24h || reminder2h) {
+      await Appointment.findOneAndUpdate(
+        { jobId: job._id },
+        {
+          ...(reminder24h && { reminderJobId24h: reminder24h.id }),
+          ...(reminder2h && { reminderJobId2h: reminder2h.id }),
+        }
+      );
+    }
 
     // Real-time broadcast
     const dateStr = startsAt.split('T')[0] ?? startsAt;
@@ -184,13 +186,13 @@ export async function updateJobStatus(
     if (input.status === 'EN_ROUTE') {
       const tech = await Technician.findById(job.technicianId).lean();
       const techFirstName = (tech?.fullName ?? '').split(' ')[0] ?? '';
-      await smsQueue.add('sms:send', {
+      await smsQueue?.add('sms:send', {
         to: sr.customerId.phone,
         templateId: SMS_TEMPLATES.sms_en_route,
         variables: { techFirstName },
       });
     } else if (input.status === 'COMPLETE') {
-      await smsQueue.add('sms:send', {
+      await smsQueue?.add('sms:send', {
         to: sr.customerId.phone,
         templateId: SMS_TEMPLATES.sms_complete,
         variables: {},
@@ -229,7 +231,7 @@ export async function reassignJob(
   // Notify original technician
   const originalTech = await Technician.findById(job.previousTechnicianId).lean();
   if (originalTech?.expoPushToken) {
-    await pushQueue.add('push:job_reassigned', {
+    await pushQueue?.add('push:job_reassigned', {
       expoPushToken: originalTech.expoPushToken,
       jobId,
     });
