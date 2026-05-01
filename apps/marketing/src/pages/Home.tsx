@@ -1,296 +1,200 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-const SERVICES = [
-  {
-    icon: '⚙',
-    title: 'Tire Install',
-    desc: 'Full mount and balance on new tires. Any brand, any vehicle.',
-    href: '/services#install',
-  },
-  {
-    icon: '◎',
-    title: 'Flat Repair',
-    desc: 'Rapid patch and plug. Most repairs done in under 30 minutes.',
-    href: '/services#repair',
-  },
-  {
-    icon: '↺',
-    title: 'Rotation',
-    desc: 'Extend tire life and maintain even tread wear across all four corners.',
-    href: '/services#rotation',
-  },
-  {
-    icon: '◈',
-    title: 'Inspection',
-    desc: 'Full tread-depth, pressure, and wheel-alignment diagnostic.',
-    href: '/services#inspection',
-  },
+const NAV_ITEMS = [
+  'Dashboard',
+  'Orders',
+  'Inventory',
+  'Catalog',
+  'Deliveries',
+  'Locations',
+  'Billing',
+  'Support',
 ];
 
-const STATS = [
-  { value: '15+', label: 'Years in Business' },
-  { value: '12,000+', label: 'Tires Installed' },
-  { value: '4.9★', label: 'Average Rating' },
-  { value: '< 60 min', label: 'Average Service Time' },
+const KPI_ITEMS = [
+  { title: 'Open Orders', value: '12', status: 'View orders', statusColor: 'text-blue-700' },
+  { title: 'Low Stock Items', value: '18', status: '18 items to reorder', statusColor: 'text-orange-600' },
+  { title: 'Deliveries Today', value: '4', status: 'On track', statusColor: 'text-emerald-600' },
+  { title: 'Monthly Spend', value: '$86,420.50', status: '+12% vs last month', statusColor: 'text-emerald-600' },
 ];
-
-/** Simple scroll-reveal hook — watches elements with class "reveal" */
-function useScrollReveal() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
 
 export function Home() {
-  useScrollReveal();
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  // Subtle parallax on hero background
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      el.style.transform = `translateY(${window.scrollY * 0.3}px)`;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
-    <>
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-screen items-end overflow-hidden pb-20 pt-32">
-        {/* Background layers */}
-        <div ref={heroRef} className="absolute inset-0 will-change-transform" aria-hidden="true">
-          {/* Deep grid */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(255,85,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,85,0,0.8) 1px, transparent 1px)',
-              backgroundSize: '80px 80px',
-            }}
-          />
-          {/* Radial glow */}
-          <div className="absolute left-0 top-1/4 h-[800px] w-[800px] -translate-x-1/3 rounded-full bg-flame-500/8 blur-[120px]" />
-          <div className="absolute bottom-0 right-0 h-[600px] w-[600px] translate-x-1/4 rounded-full bg-flame-500/5 blur-[100px]" />
-          {/* Giant background text */}
-          <div
-            className="absolute bottom-0 right-0 select-none text-[60vw] font-display font-black uppercase leading-none tracking-tighter text-onyx-800"
-            aria-hidden="true"
-          >
-            MT
-          </div>
-        </div>
-
-        <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-10">
-          <div className="max-w-5xl">
-            {/* Label */}
-            <div className="mb-8 flex items-center gap-4">
-              <span className="accent-line animate-line-grow w-12" />
-              <span className="section-label animate-fade-in">Professional Tire Service</span>
-            </div>
-
-            {/* Main headline */}
-            <h1 className="display-xl animate-slide-up text-platinum-50">
-              Gripped.
-              <br />
-              <span className="text-flame-500">Every</span> Road.
-            </h1>
-
-            {/* Subhead */}
-            <p
-              className="body-lg mt-8 max-w-lg animate-slide-up text-platinum-400"
-              style={{ animationDelay: '150ms' }}
-            >
-              Expert tire installation, repair, rotation, and inspection. Mobile service
-              available — we come to you. Book in under 60 seconds.
-            </p>
-
-            {/* CTAs */}
-            <div
-              className="mt-10 flex flex-wrap items-center gap-4 animate-slide-up"
-              style={{ animationDelay: '250ms' }}
-            >
-              <Link to="/book" className="flame-btn">
-                Book Appointment
-                <svg className="h-5 w-5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8h10m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-              <a href="tel:+15558675309" className="ghost-btn">
-                Call (555) 867-5309
-              </a>
-            </div>
+    <div className="min-h-screen bg-onyx-900 text-platinum-100">
+      <div className="md:grid md:grid-cols-[240px_1fr]">
+        <aside className="bg-navy-800 text-white md:min-h-screen">
+          <div className="px-5 pb-5 pt-6">
+            <img src="/moore-tire-lockup-partner-light.svg" alt="Moore Tire Partner Portal" className="h-11 w-auto" />
           </div>
 
-          {/* Stats strip */}
-          <div
-            className="mt-20 grid grid-cols-2 gap-px border border-onyx-700 bg-onyx-700 md:grid-cols-4 animate-fade-in"
-            style={{ animationDelay: '400ms' }}
-          >
-            {STATS.map(({ value, label }) => (
-              <div
-                key={label}
-                className="flex flex-col gap-1 bg-onyx-900 px-6 py-5 transition-colors duration-200 hover:bg-onyx-800"
-              >
-                <span className="font-display text-3xl font-black text-flame-500">{value}</span>
-                <span className="text-xs text-platinum-600">{label}</span>
+          <nav className="overflow-x-auto px-3 pb-4 md:overflow-visible" aria-label="Partner navigation">
+            <ul className="flex gap-2 md:flex-col">
+              {NAV_ITEMS.map((item, index) => (
+                <li key={item} className="shrink-0 md:shrink">
+                  <Link
+                    to={index === 0 ? '/' : '/services'}
+                    className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${
+                      index === 0 ? 'bg-blue-700 text-white' : 'text-blue-100 hover:bg-blue-900'
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="hidden p-4 md:block">
+            <div className="rounded-2xl border border-white/15 bg-white/5 p-4">
+              <p className="text-sm text-blue-100">Need help?</p>
+              <p className="mt-1 text-sm text-blue-200">Our support team is here to help.</p>
+              <button className="mt-4 w-full rounded-xl border border-blue-300/40 px-3 py-2 text-sm font-semibold text-white hover:bg-white/10">
+                Contact Support
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <main className="bg-[#f6f9ff]">
+          <header className="border-b border-[#d9e4f7] bg-white">
+            <div className="grid gap-3 px-4 py-4 sm:px-6 xl:grid-cols-[280px_1fr_auto] xl:items-center">
+              <div className="rounded-xl border border-[#d9e4f7] bg-[#f9fbff] px-4 py-2.5 text-sm font-semibold text-[#153053]">
+                Acme Construction Co.
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── SERVICES GRID ────────────────────────────────────────────────── */}
-      <section className="relative py-32" aria-labelledby="services-heading">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="reveal mb-16 flex items-start justify-between gap-8">
-            <div>
-              <span className="section-label">What We Do</span>
-              <h2 id="services-heading" className="display-lg mt-3 text-platinum-50">
-                Every Service.
-                <br />
-                Done Right.
-              </h2>
+              <div className="rounded-xl border border-[#d9e4f7] bg-[#f9fbff] px-4 py-2.5 text-sm text-[#6a7f9f]">
+                Search tires, SKUs, sizes, or orders...
+              </div>
+
+              <div className="justify-self-start text-sm text-[#193b66] xl:justify-self-end">
+                <span className="font-semibold">John Davis</span>
+                <span className="ml-2 text-[#6a7f9f]">Buyer</span>
+              </div>
             </div>
-            <Link to="/services" className="ghost-btn hidden self-end md:inline-flex">
-              All Services
-            </Link>
-          </div>
+          </header>
 
-          <div className="grid gap-px bg-onyx-700 sm:grid-cols-2 lg:grid-cols-4">
-            {SERVICES.map(({ icon, title, desc, href }, i) => (
-              <a
-                key={title}
-                href={href}
-                className="reveal group flex flex-col gap-4 bg-onyx-900 p-8 transition-colors duration-200 hover:bg-onyx-800"
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className="flex h-12 w-12 items-center justify-center border border-flame-500/20 text-2xl text-flame-500 transition-colors duration-200 group-hover:border-flame-500 group-hover:bg-flame-500/10">
-                  {icon}
-                </div>
-                <h3 className="font-display text-xl font-bold uppercase tracking-wide text-platinum-50">
-                  {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-platinum-600">{desc}</p>
-                <span className="mt-auto flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-flame-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                  Learn More
-                  <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M2 6h8m-3-3 3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── MOBILE SERVICE CALLOUT ────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-flame-500 py-24">
-        {/* Tread texture in accent section */}
-        <div className="absolute inset-0 opacity-10 tread-overlay" aria-hidden="true" />
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <span className="section-label text-white/60">Mobile Service</span>
-              <h2 className="display-lg mt-2 text-white">
-                We Come<br />To You.
-              </h2>
-              <p className="mt-4 text-lg text-white/80 leading-relaxed">
-                Can't make it in? Our mobile technicians bring the shop to your driveway, office, or roadside. Available seven days a week.
+          <div className="space-y-4 px-4 py-5 sm:px-6 lg:space-y-5 lg:py-6">
+            <section>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#0f2a52] sm:text-4xl">Good morning, Acme Construction</h1>
+              <p className="mt-2 text-base text-[#5c7597]">
+                Here is your account overview and what is happening with your orders and inventory.
               </p>
-            </div>
-            <Link
-              to="/book"
-              className="flex-shrink-0 inline-flex items-center gap-3 bg-onyx-900 px-10 py-5 font-display font-bold
-                text-lg uppercase tracking-widest text-white hover:bg-onyx-800 transition-colors duration-200"
-            >
-              Schedule Mobile Service
-              <svg className="h-5 w-5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 8h10m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      {/* ── TESTIMONIALS ─────────────────────────────────────────────────── */}
-      <section className="py-32" aria-labelledby="testimonials-heading">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="reveal mb-16">
-            <span className="section-label">Reviews</span>
-            <h2 id="testimonials-heading" className="display-lg mt-3 text-platinum-50">
-              What Customers Say.
-            </h2>
-          </div>
-          <div className="grid gap-px bg-onyx-700 md:grid-cols-3">
-            {[
-              {
-                quote: "Pulled in with a nail in my rear tire. They fixed it in 20 minutes — didn't even charge me an arm and a leg. Will be back for my next set.",
-                name: 'Marcus T.',
-                detail: 'Honda Accord, Flat Repair',
-              },
-              {
-                quote: "The mobile service is a game changer. Tech showed up to my office parking lot and put on four new tires while I was in meetings. Incredible.",
-                name: 'Erica L.',
-                detail: 'Ford Explorer, Full Install',
-              },
-              {
-                quote: "Super professional. They found a slow leak I'd been ignoring for weeks during the inspection. These guys actually look out for you.",
-                name: 'David K.',
-                detail: 'Toyota Tacoma, Inspection',
-              },
-            ].map(({ quote, name, detail }, i) => (
-              <blockquote
-                key={name}
-                className="reveal flex flex-col gap-6 bg-onyx-900 p-8 hover:bg-onyx-800 transition-colors duration-200"
-                style={{ transitionDelay: `${i * 100}ms` }}
-              >
-                <div className="text-flame-500 text-3xl leading-none" aria-hidden="true">"</div>
-                <p className="flex-1 text-sm leading-loose text-platinum-400">{quote}</p>
-                <footer>
-                  <p className="font-display font-bold text-platinum-100">{name}</p>
-                  <p className="text-xs text-platinum-600">{detail}</p>
-                </footer>
-              </blockquote>
-            ))}
-          </div>
-        </div>
-      </section>
+            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {KPI_ITEMS.map((item) => (
+                <article key={item.title} className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                  <p className="text-sm font-medium text-[#5f7798]">{item.title}</p>
+                  <p className="mt-2 text-4xl font-extrabold leading-none text-[#112f58]">{item.value}</p>
+                  <p className={`mt-3 text-sm font-semibold ${item.statusColor}`}>{item.status}</p>
+                </article>
+              ))}
+            </section>
 
-      {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-onyx-700 py-32 tread-overlay">
-        <div className="reveal mx-auto max-w-3xl px-6 text-center lg:px-10">
-          <span className="section-label">Ready?</span>
-          <h2 className="display-lg mt-4 text-platinum-50">
-            Book Your Service<br />
-            <span className="text-flame-500">Today.</span>
-          </h2>
-          <p className="body-lg mx-auto mt-6 max-w-md">
-            Takes less than 60 seconds. You'll get an SMS confirmation immediately.
-          </p>
-          <Link to="/book" className="flame-btn mt-10 text-lg">
-            Get Started
-            <svg className="h-5 w-5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 8h10m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-        </div>
-      </section>
-    </>
+            <section className="grid gap-4 2xl:grid-cols-[1fr_1.3fr_1.3fr]">
+              <article className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                <h2 className="text-xl font-bold text-[#112f58]">Inventory Health</h2>
+                <div className="mt-6 grid place-items-center">
+                  <div className="grid h-44 w-44 place-items-center rounded-full border-[18px] border-emerald-500/80 bg-white">
+                    <div className="text-center">
+                      <p className="text-4xl font-extrabold text-[#133461]">74%</p>
+                      <p className="text-sm font-semibold text-emerald-600">Good Health</p>
+                    </div>
+                  </div>
+                </div>
+                <Link to="/inventory" className="mt-6 inline-block text-sm font-semibold text-blue-700 hover:text-blue-800">
+                  View inventory
+                </Link>
+              </article>
+
+              <article className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                <h2 className="text-xl font-bold text-[#112f58]">Low Stock / Replenishment</h2>
+                <div className="mt-4 space-y-3">
+                  {['10R22.5 G622 RSD', '12R22.5 G283A', '315/80R22.5 G159', '11R24.5 G622 LHD'].map((sku, i) => (
+                    <div key={sku} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-[#e4ecfa] bg-[#fbfdff] px-3 py-3">
+                      <p className="text-sm font-semibold text-[#17355f]">{sku}</p>
+                      <p className="text-sm text-[#5e7696]">{[6, 8, 4, 7][i]} on hand</p>
+                      <button className="rounded-lg border border-orange-300 px-2.5 py-1 text-xs font-semibold text-orange-600 hover:bg-orange-50">
+                        Reorder
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                <h2 className="text-xl font-bold text-[#112f58]">Deliveries Overview</h2>
+                <div className="mt-4 space-y-2 text-sm text-[#1f3f68]">
+                  {['Acme HQ - Main Yard', 'Acme Site - North', 'Acme Site - South'].map((stop, i) => (
+                    <div key={stop} className="rounded-xl border border-[#e4ecfa] bg-[#fbfdff] px-3 py-2.5">
+                      <p className="font-semibold">{stop}</p>
+                      <p className="text-[#5f7798]">{['Out for delivery', 'On the way', 'Scheduled'][i]}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 h-36 rounded-xl border border-[#d9e4f7] bg-[linear-gradient(135deg,#eaf2ff,#dfeafb)]" />
+              </article>
+            </section>
+
+            <section className="grid gap-4 xl:grid-cols-[1.8fr_1fr]">
+              <article className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-[#112f58]">Recent Orders</h2>
+                  <Link to="/orders" className="text-sm font-semibold text-blue-700 hover:text-blue-800">
+                    View all orders
+                  </Link>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="text-[#6780a1]">
+                      <tr>
+                        <th className="py-2 pr-4">Order #</th>
+                        <th className="py-2 pr-4">Date</th>
+                        <th className="py-2 pr-4">Status</th>
+                        <th className="py-2 pr-4">Items</th>
+                        <th className="py-2">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-[#1b3b64]">
+                      {[
+                        ['SO-248731', 'May 19, 2025', 'Partially Shipped', '8 tires', '$8,742.30'],
+                        ['SO-248452', 'May 16, 2025', 'Shipped', '6 tires', '$6,129.75'],
+                        ['SO-248112', 'May 13, 2025', 'Delivered', '10 tires', '$10,482.60'],
+                      ].map((row) => (
+                        <tr key={row[0]} className="border-t border-[#ebf1fb]">
+                          {row.map((cell) => (
+                            <td key={cell} className="py-3 pr-4">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article className="rounded-2xl border border-[#d9e4f7] bg-white p-5 shadow-[0_6px_20px_rgba(12,36,72,0.08)]">
+                <h2 className="text-xl font-bold text-[#112f58]">Account Snapshot</h2>
+                <div className="mt-4 space-y-4 text-sm text-[#1e3d66]">
+                  <div className="rounded-xl border border-[#e4ecfa] bg-[#fbfdff] px-3 py-3">
+                    <p className="font-semibold">Locations</p>
+                    <p className="text-[#60789a]">5 active locations</p>
+                  </div>
+                  <div className="rounded-xl border border-[#e4ecfa] bg-[#fbfdff] px-3 py-3">
+                    <p className="font-semibold">Current Balance</p>
+                    <p className="text-2xl font-extrabold text-[#13315a]">$12,560.75</p>
+                  </div>
+                  <div className="rounded-xl border border-[#e4ecfa] bg-[#fbfdff] px-3 py-3">
+                    <p className="font-semibold">Next Statement Date</p>
+                    <p className="text-[#60789a]">June 1, 2025</p>
+                  </div>
+                </div>
+              </article>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Header } from './components/Header.js';
 import { Footer } from './components/Footer.js';
 import { Home } from './pages/Home.js';
@@ -11,18 +12,31 @@ import Register from './pages/Register.js';
 import Tires from './pages/Tires.js';
 import Cart from './pages/Cart.js';
 import Checkout from './pages/Checkout.js';
+import { ENABLE_SERVICE_BOOKING } from './config/features.js';
 
 export function App() {
+  const location = useLocation();
+  const isPortalHome = location.pathname === '/';
+  const theme: 'light' = 'light';
+
+  useEffect(() => {
+    document.documentElement.dataset['theme'] = 'light';
+    localStorage.setItem('marketing-theme', 'light');
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      {!isPortalHome && <Header theme={theme} />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/book" element={<Book />} />
+          <Route
+            path="/book"
+            element={ENABLE_SERVICE_BOOKING ? <Book /> : <Navigate to="/tires" replace />}
+          />
           <Route path="/tires" element={<Tires />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -30,7 +44,7 @@ export function App() {
           <Route path="/register" element={<Register />} />
         </Routes>
       </main>
-      <Footer />
+      {!isPortalHome && <Footer theme={theme} />}
     </div>
   );
 }

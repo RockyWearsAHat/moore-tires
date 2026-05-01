@@ -94,17 +94,17 @@ export function DistributionCentersPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center justify-between border-b border-surface-border bg-[#0D0F14] px-6 py-4">
+      <header className="page-header flex items-center justify-between px-6 py-4">
         <div>
-          <h1 className="font-display font-bold text-xl uppercase tracking-wider text-gray-100">
+          <h1 className="font-display theme-text-strong text-xl font-bold uppercase tracking-wider">
             Distribution Centers
           </h1>
-          <p className="text-xs text-gray-500">Manage warehouses for delivery ETA calculations</p>
+          <p className="theme-text-faint text-xs">Manage warehouses for delivery ETA calculations</p>
         </div>
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="rounded bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-400 transition-colors"
+          className="theme-button-primary rounded px-4 py-2 text-xs font-semibold"
         >
           + Add Center
         </button>
@@ -121,44 +121,44 @@ export function DistributionCentersPage() {
                 placeholder="Name"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                className="theme-input rounded px-3 py-2 text-sm"
               />
               <input
                 placeholder="State (e.g. WA)"
                 value={form.state}
                 onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
-                className="rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                className="theme-input rounded px-3 py-2 text-sm"
               />
               <input
                 placeholder="Address"
                 value={form.address}
                 onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-                className="rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                className="theme-input rounded px-3 py-2 text-sm"
               />
               <input
                 placeholder="City"
                 value={form.city}
                 onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                className="rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                className="theme-input rounded px-3 py-2 text-sm"
               />
               <input
                 placeholder="ZIP"
                 value={form.zip}
                 onChange={(e) => setForm((f) => ({ ...f, zip: e.target.value }))}
-                className="rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                className="theme-input rounded px-3 py-2 text-sm"
               />
               <div className="flex gap-2">
                 <input
                   placeholder="Latitude"
                   value={form.lat}
                   onChange={(e) => setForm((f) => ({ ...f, lat: e.target.value }))}
-                  className="w-1/2 rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                  className="theme-input w-1/2 rounded px-3 py-2 text-sm"
                 />
                 <input
                   placeholder="Longitude"
                   value={form.lng}
                   onChange={(e) => setForm((f) => ({ ...f, lng: e.target.value }))}
-                  className="w-1/2 rounded bg-surface-base border border-surface-border px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-brand-500 focus:outline-none"
+                  className="theme-input w-1/2 rounded px-3 py-2 text-sm"
                 />
               </div>
             </div>
@@ -167,14 +167,14 @@ export function DistributionCentersPage() {
                 type="button"
                 onClick={() => void handleCreate()}
                 disabled={saving || !form.name || !form.state}
-                className="rounded bg-brand-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-brand-400 disabled:opacity-50 transition-colors"
+                className="theme-button-primary rounded px-4 py-1.5 text-xs font-semibold disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Create'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded border border-surface-border px-4 py-1.5 text-xs font-semibold text-gray-400 hover:text-gray-100 transition-colors"
+                className="theme-button-secondary rounded px-4 py-1.5 text-xs font-semibold"
               >
                 Cancel
               </button>

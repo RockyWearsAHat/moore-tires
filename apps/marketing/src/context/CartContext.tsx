@@ -33,7 +33,9 @@ const CART_KEY = 'moore_cart';
 function loadCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
   } catch {
     return [];
   }

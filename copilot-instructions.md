@@ -105,6 +105,11 @@ pnpm lint           # eslint + tsc --noEmit across all packages
 - **Customer** — an end-user or business contact associated with service history, ordering, or account activity.
 - **Technician** — employee with skills, availability, assigned territory, or operational responsibilities.
 
+## Feature Flags
+- Marketing booking flow is behind `VITE_ENABLE_SERVICE_BOOKING`.
+- Default behavior: booking disabled (`false`) for wholesale-first mode.
+- Set `VITE_ENABLE_SERVICE_BOOKING=true` to expose `/book` and booking CTAs.
+
 ## Constraints
 - Phone support is mandatory on all customer-facing flows; no desktop-only UX.
 - The marketing site must achieve Lighthouse performance score ≥ 90.

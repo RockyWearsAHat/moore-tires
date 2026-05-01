@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useApiFetch } from '../hooks/useApi';
+import { parseJson } from '../utils/http';
 
 interface DeliveryEstimate {
   minDays: number;
@@ -25,7 +26,6 @@ export default function Checkout() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<'shipping' | 'review' | 'confirmation'>('shipping');
-  const [zip, setZip] = useState('');
   const [address, setAddress] = useState({ line1: '', city: '', state: '', zip: '' });
   const [eta, setEta] = useState<DeliveryEstimate | null>(null);
   const [loadingEta, setLoadingEta] = useState(false);
@@ -57,7 +57,7 @@ export default function Checkout() {
         body: JSON.stringify({ zip: address.zip }),
       });
       if (res.ok) {
-        const json = (await res.json()) as { data: DeliveryEstimate };
+        const json = await parseJson<{ data: DeliveryEstimate }>(res);
         setEta(json.data);
       }
     } finally {
@@ -91,25 +91,30 @@ export default function Checkout() {
           shippingAddress: address,
         }),
       });
+      const orderJson = await parseJson<{ data?: { id: string }; message?: string }>(orderRes);
 
       if (!orderRes.ok) {
-        const err = (await orderRes.json()) as { message?: string };
-        throw new Error(err.message ?? 'Failed to create order');
+        throw new Error(orderJson.message ?? 'Failed to create order');
       }
 
-      const orderJson = (await orderRes.json()) as { data: { id: string } };
-      const orderId = orderJson.data.id;
+      const orderId = orderJson.data?.id;
+      if (!orderId) {
+        throw new Error('Order response did not include an order ID');
+      }
 
       // Process checkout/payment
       const checkoutRes = await apiFetch(`/api/v1/checkout/${orderId}`, {
         method: 'POST',
       });
+      const checkoutJson = await parseJson<{ data?: CheckoutResult; message?: string }>(checkoutRes);
       if (!checkoutRes.ok) {
-        const err = (await checkoutRes.json()) as { message?: string };
-        throw new Error(err.message ?? 'Payment failed');
+        throw new Error(checkoutJson.message ?? 'Payment failed');
       }
 
-      const checkoutJson = (await checkoutRes.json()) as { data: CheckoutResult };
+      if (!checkoutJson.data) {
+        throw new Error('Checkout response did not include payment details');
+      }
+
       setOrderResult(checkoutJson.data);
       clearCart();
       setStep('confirmation');
@@ -234,7 +239,7 @@ export default function Checkout() {
             </div>
 
             {/* Delivery Estimate */}
-            {(eta || loadingEta) && (
+            {(Boolean(eta) || loadingEta) && (
               <div className="rounded border border-onyx-700 bg-onyx-800 px-4 py-3">
                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Estimated Delivery</p>
                 {loadingEta ? (
@@ -304,7 +309,7 @@ export default function Checkout() {
               Order Confirmed
             </h2>
             <p className="text-gray-400">
-              Your order has been placed successfully. You'll receive a confirmation email shortly.
+              Your order has been placed successfully. You&apos;ll receive a confirmation email shortly.
             </p>
             <div className="rounded border border-onyx-700 bg-onyx-800 px-4 py-3 text-left">
               <p className="text-xs text-gray-500">Order ID</p>

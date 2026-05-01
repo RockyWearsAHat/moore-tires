@@ -46,6 +46,24 @@ module.exports = {
       },
     },
     {
+      files: ["packages/api/**"],
+      rules: {
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/prefer-optional-chain": "off",
+        "@typescript-eslint/prefer-nullish-coalescing": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/no-useless-escape": "off",
+        "@typescript-eslint/consistent-type-imports": "off",
+      },
+    },
+    {
       files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"],
       rules: {
         "@typescript-eslint/no-unsafe-assignment": "off",

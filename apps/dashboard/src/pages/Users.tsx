@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useDashboardApi } from '../hooks/useDashboardApi';
 import { useDashboardAuth } from '../context/DashboardAuthContext';
 import type { UserRole } from '@moore-tires/shared';
+import { parseJson, type ApiResponse } from '../utils/http';
 
 interface UserEntry {
   id: string;
@@ -47,14 +48,14 @@ export function UsersPage() {
   const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
-    loadUsers();
+    void loadUsers();
   }, []);
 
   async function loadUsers() {
     setLoading(true);
     try {
       const res = await apiFetch('/api/v1/auth/users');
-      const json = await res.json();
+      const json = await parseJson<ApiResponse<UserEntry[]>>(res);
       if (json.success) setUsers(json.data);
     } catch {
       // Network error
@@ -67,7 +68,7 @@ export function UsersPage() {
     if (!confirm('Are you sure you want to deactivate this user?')) return;
     try {
       await apiFetch(`/api/v1/auth/users/${userId}/deactivate`, { method: 'POST' });
-      loadUsers();
+      void loadUsers();
     } catch {
       // Error
     }
@@ -84,14 +85,20 @@ export function UsersPage() {
         method: 'POST',
         body: JSON.stringify(inviteForm),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message || 'Invite failed');
+      const json = await parseJson<ApiResponse<unknown>>(res);
+      if (!res.ok) {
+        const message = !json.success ? json.error?.message : undefined;
+        throw new Error(message ?? 'Invite failed');
+      }
+      if (!json.success) {
+        throw new Error(json.error?.message ?? 'Invite failed');
+      }
 
       setInviteSuccess(
         `Invitation sent to ${inviteForm.email}. They will receive an email with login credentials.`
       );
       setInviteForm({ email: '', firstName: '', lastName: '', role: 'admin' });
-      loadUsers();
+      void loadUsers();
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : 'Invite failed');
     } finally {
@@ -100,22 +107,22 @@ export function UsersPage() {
   }
 
   const inputClass =
-    'mt-1 block w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-gray-100 placeholder-gray-600 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500';
+    'theme-input mt-1 block w-full rounded-lg px-3 py-2 text-sm';
 
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-gray-100">
+          <h1 className="font-display theme-text-strong text-2xl font-bold uppercase tracking-wide">
             Users
           </h1>
-          <p className="text-sm text-gray-500">{users.length} users</p>
+          <p className="theme-text-faint text-sm">{users.length} users</p>
         </div>
 
         {isAdmin && (
           <button
             onClick={() => setShowInvite(!showInvite)}
-            className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-brand-400"
+            className="theme-button-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold uppercase tracking-wider"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -128,10 +135,10 @@ export function UsersPage() {
       {/* Invite Form */}
       {showInvite && isAdmin && (
         <div className="card mb-6 p-5">
-          <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-gray-100">
+          <h2 className="font-display theme-text-strong text-lg font-semibold uppercase tracking-wide">
             Invite New User
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="theme-text-faint mt-1 text-sm">
             Send an invitation email with temporary login credentials.
           </p>
 
@@ -148,7 +155,7 @@ export function UsersPage() {
 
           <form onSubmit={handleInvite} className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-medium text-gray-400">Email</label>
+              <label className="theme-text-muted block text-xs font-medium">Email</label>
               <input
                 type="email"
                 required
@@ -159,7 +166,7 @@ export function UsersPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400">Role</label>
+              <label className="theme-text-muted block text-xs font-medium">Role</label>
               <select
                 value={inviteForm.role}
                 onChange={(e) =>
@@ -173,7 +180,7 @@ export function UsersPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400">First Name</label>
+              <label className="theme-text-muted block text-xs font-medium">First Name</label>
               <input
                 required
                 value={inviteForm.firstName}
@@ -183,7 +190,7 @@ export function UsersPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400">Last Name</label>
+              <label className="theme-text-muted block text-xs font-medium">Last Name</label>
               <input
                 required
                 value={inviteForm.lastName}
@@ -197,14 +204,14 @@ export function UsersPage() {
               <button
                 type="button"
                 onClick={() => setShowInvite(false)}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm text-gray-400 transition hover:text-gray-200"
+                className="theme-button-secondary rounded-lg px-4 py-2 text-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={inviting}
-                className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-brand-400 disabled:opacity-50"
+                className="theme-button-primary flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold uppercase tracking-wider disabled:opacity-50"
               >
                 {inviting ? 'Sending…' : 'Send Invitation'}
               </button>
@@ -227,11 +234,11 @@ export function UsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-surface-border text-left">
-                <th className="px-3 py-3 font-medium text-gray-500">Name</th>
-                <th className="px-3 py-3 font-medium text-gray-500">Email</th>
-                <th className="px-3 py-3 font-medium text-gray-500">Role</th>
+                <th className="theme-text-faint px-3 py-3 font-medium">Name</th>
+                <th className="theme-text-faint px-3 py-3 font-medium">Email</th>
+                <th className="theme-text-faint px-3 py-3 font-medium">Role</th>
                 {isAdmin && (
-                  <th className="px-3 py-3 font-medium text-gray-500 text-right">Actions</th>
+                  <th className="theme-text-faint px-3 py-3 text-right font-medium">Actions</th>
                 )}
               </tr>
             </thead>
@@ -241,10 +248,10 @@ export function UsersPage() {
                   key={u.id}
                   className="border-b border-surface-border/50 hover:bg-surface-elevated/50"
                 >
-                  <td className="px-3 py-3 text-gray-200">
+                  <td className="theme-text-body px-3 py-3">
                     {u.firstName} {u.lastName}
                   </td>
-                  <td className="px-3 py-3 text-gray-400">{u.email}</td>
+                  <td className="theme-text-muted px-3 py-3">{u.email}</td>
                   <td className="px-3 py-3">
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${ROLE_CLASSES[u.role] ?? 'bg-gray-500/10 text-gray-400'}`}
@@ -256,8 +263,10 @@ export function UsersPage() {
                     <td className="px-3 py-3 text-right">
                       {u.role !== 'admin' && (
                         <button
-                          onClick={() => deactivateUser(u.id)}
-                          className="text-xs text-gray-500 transition hover:text-red-400"
+                          onClick={() => {
+                            void deactivateUser(u.id);
+                          }}
+                          className="theme-text-faint text-xs transition hover:text-red-400"
                         >
                           Deactivate
                         </button>

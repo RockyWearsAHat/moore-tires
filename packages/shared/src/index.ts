@@ -71,7 +71,7 @@ export const CreateServiceRequestSchema = z.object({
   vehicleYear: z.number().int().min(1900).max(new Date().getFullYear() + 1),
   vehicleMake: z.string().min(1).max(50),
   vehicleModel: z.string().min(1).max(50),
-  licensePlate: z.string().min(1).max(20),
+  licensePlate: z.string().min(1).max(20).transform((v) => v.toUpperCase()),
 
   // Service details
   serviceType: ServiceTypeSchema,

@@ -1,4 +1,4 @@
-import { Schema, model, type Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { type TechnicianCapability } from '@moore-tires/shared';
 
 export interface ITechnician {
@@ -32,7 +32,7 @@ const TechnicianSchema = new Schema<ITechnician>(
     toJSON: {
       virtuals: true,
       transform(_doc, ret) {
-        ret['id'] = (ret['_id'] as Types.ObjectId).toString();
+        ret.id = String(ret._id);
         Reflect.deleteProperty(ret, '_id');
         Reflect.deleteProperty(ret, '__v');
       },

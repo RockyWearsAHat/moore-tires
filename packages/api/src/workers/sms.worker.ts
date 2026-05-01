@@ -10,7 +10,7 @@ import { redis } from '../queue.js';
 
 const SMS_TEMPLATES: Record<string, (vars: Record<string, string>) => string> = {
   sms_receipt: (v) =>
-    `Hi ${v['firstName'] ?? ''}, Moore Tires received your request for ${v['serviceType'] ?? ''} on ${v['preferredDate'] ?? ''}. We\'ll confirm your appointment time shortly. Questions? Call (555) 867-5309.`,
+    `Hi ${v['firstName'] ?? ''}, Moore Tires received your request for ${v['serviceType'] ?? ''} on ${v['preferredDate'] ?? ''}. We'll confirm your appointment time shortly. Questions? Call (555) 867-5309.`,
   sms_confirmed: (v) =>
     `Your appointment is confirmed for ${v['dateTime'] ?? ''}. Technician: ${v['techFirstName'] ?? ''}. Reply STOP to opt out.`,
   sms_reminder_24h: (v) =>

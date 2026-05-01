@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ENABLE_SERVICE_BOOKING } from '../config/features.js';
 
 const LINKS = {
   Services: [
@@ -10,30 +11,34 @@ const LINKS = {
   Company: [
     { label: 'About Us', to: '/about' },
     { label: 'Contact', to: '/contact' },
-    { label: 'Book Appointment', to: '/book' },
+    {
+      label: ENABLE_SERVICE_BOOKING ? 'Book Appointment' : 'Order Tires',
+      to: ENABLE_SERVICE_BOOKING ? '/book' : '/tires',
+    },
   ],
 };
 
-export function Footer() {
+interface FooterProps {
+  theme: 'light' | 'dark';
+}
+
+export function Footer({ theme }: FooterProps) {
   return (
-    <footer className="border-t border-onyx-700 bg-onyx-950 tread-overlay">
+    <footer className="border-t border-onyx-700 bg-onyx-950">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10">
         <div className="grid gap-12 md:grid-cols-3 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="inline-flex items-center gap-3 mb-4">
-              <span className="flex h-8 w-8 items-center justify-center bg-flame-500">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-white" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" fill="none" stroke="white" strokeWidth="2" />
-                  <circle cx="12" cy="12" r="4" fill="white" />
-                </svg>
-              </span>
-              <span className="font-display font-extrabold text-lg uppercase tracking-widest text-platinum-50">
-                Moore <span className="text-flame-500">Tires</span>
-              </span>
+              <img
+                src={theme === 'light' ? '/moore-tire-wordmark-dark.svg' : '/moore-tire-wordmark-light.svg'}
+                alt="Moore Tire"
+                className="h-7 w-auto"
+              />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-platinum-600">
-              Professional tire services with precision and pride. Serving the community since 2009.
+              Industrial tire supply for construction, logistics, and fleet operations.
+              Serving partners across the region since 2009.
             </p>
             <p className="mt-4 font-display font-bold text-2xl text-platinum-50">
               (555) 867-5309

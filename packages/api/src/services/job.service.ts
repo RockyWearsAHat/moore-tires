@@ -9,7 +9,7 @@ import {
   JOB_STATUS_TRANSITIONS,
   SMS_TEMPLATES,
 } from '@moore-tires/shared';
-import { Job, Appointment, ServiceRequest, Technician, Customer } from '@moore-tires/db';
+import { Job, Appointment, ServiceRequest, Technician } from '@moore-tires/db';
 import { AppError } from '../errors.js';
 import { pushQueue, smsQueue, reminderQueue } from '../queue.js';
 import {
@@ -17,12 +17,85 @@ import {
   emitCalendarUpdated,
 } from '../socket.js';
 
+// ─── Private Helpers ──────────────────────────────────────────────────────────
+
+interface NotifyJobScheduledParams {
+  jobId: string;
+  technicianId: string;
+  serviceRequestId: string;
+  startsAt: string;
+  startsAtDate: Date;
+}
+
+/**
+ * Sends push notification to the assigned technician, confirmation SMS to the
+ * customer, and enqueues 24h + 2h reminder SMS jobs.
+ *
+ * Must only be called AFTER the scheduling transaction has committed.
+ */
+async function notifyJobScheduled({
+  jobId,
+  technicianId,
+  serviceRequestId,
+  startsAt,
+  startsAtDate,
+}: NotifyJobScheduledParams): Promise<void> {
+  const technician = await Technician.findById(technicianId).lean();
+  if (technician?.expoPushToken) {
+    await pushQueue?.add('push:job_assigned', {
+      expoPushToken: technician.expoPushToken,
+      jobId,
+      address: 'See job details',
+      dateTime: startsAt,
+    });
+  }
+
+  const sr = await ServiceRequest.findById(serviceRequestId)
+    .populate<{ customerId: { phone: string; fullName: string } }>('customerId', 'phone fullName')
+    .lean();
+
+  if (sr?.customerId && typeof sr.customerId !== 'string') {
+    const firstName = technician?.fullName.split(' ')[0] ?? '';
+    await smsQueue?.add('sms:send', {
+      to: sr.customerId.phone,
+      templateId: SMS_TEMPLATES.sms_confirmed,
+      variables: { techFirstName: firstName, dateTime: startsAt },
+    });
+  }
+
+  const customerPhone =
+    sr?.customerId && typeof sr.customerId !== 'string' ? sr.customerId.phone : '';
+
+  const reminder24h = await reminderQueue?.add(
+    'sms:reminder',
+    { to: customerPhone, templateId: SMS_TEMPLATES.sms_reminder_24h, variables: { dateTime: startsAt } },
+    { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 24 * 60 * 60 * 1000) }
+  );
+  const reminder2h = await reminderQueue?.add(
+    'sms:reminder',
+    { to: customerPhone, templateId: SMS_TEMPLATES.sms_reminder_2h, variables: { dateTime: startsAt } },
+    { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 2 * 60 * 60 * 1000) }
+  );
+
+  if (reminder24h || reminder2h) {
+    await Appointment.findOneAndUpdate(
+      { jobId },
+      {
+        ...(reminder24h && { reminderJobId24h: reminder24h.id }),
+        ...(reminder2h && { reminderJobId2h: reminder2h.id }),
+      }
+    );
+  }
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
 /**
  * Schedules a job: conflict-checks the technician's calendar, creates Job +
  * Appointment in a MongoDB transaction, sends push notification, and enqueues
  * reminders.
  */
-export async function scheduleJob(input: ScheduleJobInput, scheduledById: string) {
+export async function scheduleJob(input: ScheduleJobInput, _scheduledById: string) {
   const { serviceRequestId, technicianId, startsAt, endsAt } = input;
 
   const startsAtDate = new Date(startsAt);
@@ -78,61 +151,13 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
     await session.commitTransaction();
 
     // ── Post-transaction: notifications ────────────────────────────────────
-    const technician = await Technician.findById(technicianId).lean();
-    if (technician?.expoPushToken) {
-      await pushQueue?.add('push:job_assigned', {
-        expoPushToken: technician.expoPushToken,
-        jobId: String(job._id),
-        address: 'See job details',
-        dateTime: startsAt,
-      });
-    }
-
-    // Customer SMS: appointment confirmed
-    const sr = await ServiceRequest.findById(serviceRequestId)
-      .populate<{ customerId: { phone: string; fullName: string } }>('customerId', 'phone fullName')
-      .lean();
-
-    if (sr?.customerId && typeof sr.customerId !== 'string') {
-      const firstName = technician?.fullName.split(' ')[0] ?? '';
-      await smsQueue?.add('sms:send', {
-        to: sr.customerId.phone,
-        templateId: SMS_TEMPLATES.sms_confirmed,
-        variables: {
-          techFirstName: firstName,
-          dateTime: startsAt,
-        },
-      });
-    }
-
-    // Reminder jobs — store BullMQ jobId on Appointment for cancellation (AC-18)
-    const reminder24h = await reminderQueue?.add(
-      'sms:reminder',
-      {
-        to: sr?.customerId && typeof sr.customerId !== 'string' ? sr.customerId.phone : '',
-        templateId: SMS_TEMPLATES.sms_reminder_24h,
-        variables: { dateTime: startsAt },
-      },
-      { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 24 * 60 * 60 * 1000) }
-    );
-    const reminder2h = await reminderQueue?.add(
-      'sms:reminder',
-      {
-        to: sr?.customerId && typeof sr.customerId !== 'string' ? sr.customerId.phone : '',
-        templateId: SMS_TEMPLATES.sms_reminder_2h,
-        variables: { dateTime: startsAt },
-      },
-      { delay: Math.max(0, startsAtDate.getTime() - Date.now() - 2 * 60 * 60 * 1000) }
-    );
-    if (reminder24h || reminder2h) {
-      await Appointment.findOneAndUpdate(
-        { jobId: job._id },
-        {
-          ...(reminder24h && { reminderJobId24h: reminder24h.id }),
-          ...(reminder2h && { reminderJobId2h: reminder2h.id }),
-        }
-      );
-    }
+    await notifyJobScheduled({
+      jobId: String(job._id),
+      technicianId,
+      serviceRequestId,
+      startsAt,
+      startsAtDate,
+    });
 
     // Real-time broadcast
     const dateStr = startsAt.split('T')[0] ?? startsAt;
@@ -153,7 +178,7 @@ export async function scheduleJob(input: ScheduleJobInput, scheduledById: string
 export async function updateJobStatus(
   jobId: string,
   input: UpdateJobStatusInput,
-  requesterId: string
+  _requesterId: string
 ) {
   const job = await Job.findById(jobId);
   if (!job) throw AppError.notFound(`Job ${jobId} not found`);

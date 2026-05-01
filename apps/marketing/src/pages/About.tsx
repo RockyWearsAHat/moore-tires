@@ -18,7 +18,7 @@ export function About() {
               Moore Tires was founded in 2009 by Carl Moore, a third-generation mechanic who believed tire service deserved the same precision as a race pit crew — without the race prices.
             </p>
             <p className="mt-6 leading-loose text-platinum-600">
-              What started as a single bay shop has grown into a full-service operation with mobile units covering the whole metro area. One thing hasn't changed: every job gets treated like it's the car we drive home.
+              What started as a single bay shop has grown into a full-service operation with mobile units covering the whole metro area. One thing has not changed: every job gets treated like it is the car we drive home.
             </p>
             <p className="mt-6 leading-loose text-platinum-600">
               In 2023 we launched real-time dispatching and SMS updates so customers stop wondering where their tech is. We think communication is the actual job — the tire work is just the result.

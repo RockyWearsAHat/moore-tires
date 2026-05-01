@@ -54,8 +54,8 @@ export function Book() {
           <span className="section-label">Appointments</span>
           <h1 className="display-lg mt-3 text-platinum-50">Book Service.</h1>
           <p className="body-lg mt-4 max-w-lg">
-            Fill in the form and we'll confirm your appointment within the hour.
-            You'll get an SMS as soon as your request is received.
+            Fill in the form and we&apos;ll confirm your appointment within the hour.
+            You&apos;ll get an SMS as soon as your request is received.
           </p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export function Book() {
             </div>
             <h2 className="display-md text-platinum-50">Request Received</h2>
             <p className="body-lg mt-4">
-              Check your phone — an SMS confirmation is on its way. We'll reach out shortly to confirm your appointment time.
+              Check your phone — an SMS confirmation is on its way. We&apos;ll reach out shortly to confirm your appointment time.
             </p>
             <button
               type="button"
@@ -90,7 +90,7 @@ export function Book() {
                 {[
                   { icon: '⚡', title: 'Fast Turnaround', body: 'Most services completed in under an hour. Your time matters.' },
                   { icon: '📍', title: 'Mobile Service', body: 'Toggle the mobile option and our tech comes to you — driveway, office, or roadside.' },
-                  { icon: '💬', title: 'Real-Time Updates', body: "We'll text you when your tech is en route and when the job is done." },
+                  { icon: '💬', title: 'Real-Time Updates', body: 'We will text you when your tech is en route and when the job is done.' },
                   { icon: '🔒', title: 'Transparent Pricing', body: 'No hidden fees, no upsell pressure. Every charge explained upfront.' },
                 ].map(({ icon, title, body }) => (
                   <li key={title} className="flex gap-4">

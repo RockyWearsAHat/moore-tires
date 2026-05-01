@@ -17,7 +17,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --external react",
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "clean": "rimraf dist"
   },
   "peerDependencies": {

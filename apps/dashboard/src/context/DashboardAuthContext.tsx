@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { AuthUser, AuthTokens, UserRole } from '@moore-tires/shared';
+import { parseJson, type ApiResponse } from '../utils/http';
 
 interface AuthState {
   user: AuthUser | null;
@@ -24,7 +25,10 @@ interface DashboardAuthContextValue extends AuthState {
 
 const DashboardAuthContext = createContext<DashboardAuthContextValue | null>(null);
 
-const API = import.meta.env['VITE_API_URL'] || 'http://localhost:3001';
+const API =
+  typeof import.meta.env['VITE_API_URL'] === 'string' && import.meta.env['VITE_API_URL'].length > 0
+    ? import.meta.env['VITE_API_URL']
+    : 'http://localhost:3001';
 const STORAGE_KEY = 'moore_dashboard_auth';
 
 /** Admin/employee roles that may access the dashboard. */
@@ -38,12 +42,33 @@ function clear() {
   sessionStorage.removeItem(STORAGE_KEY);
 }
 
+interface StoredAuth {
+  user: AuthUser;
+  tokens: AuthTokens;
+}
+
+function isStoredAuth(value: unknown): value is StoredAuth {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as {
+    user?: { role?: unknown };
+    tokens?: { accessToken?: unknown; refreshToken?: unknown };
+  };
+
+  return (
+    typeof candidate.user?.role === 'string' &&
+    DASHBOARD_ROLES.includes(candidate.user.role as UserRole) &&
+    typeof candidate.tokens?.accessToken === 'string' &&
+    typeof candidate.tokens?.refreshToken === 'string'
+  );
+}
+
 function load(): { user: AuthUser; tokens: AuthTokens } | null {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data?.user?.role || !DASHBOARD_ROLES.includes(data.user.role)) {
+    const data = JSON.parse(raw) as unknown;
+    if (!isStoredAuth(data)) {
       clear();
       return null;
     }
@@ -76,10 +101,16 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error?.message || 'Login failed');
+    const json = await parseJson<ApiResponse<{ user: AuthUser; tokens: AuthTokens }>>(res);
+    if (!res.ok) {
+      const message = !json.success ? json.error?.message : undefined;
+      throw new Error(message ?? 'Login failed');
+    }
+    if (!json.success) {
+      throw new Error(json.error?.message ?? 'Login failed');
+    }
 
-    const { user, tokens } = json.data as { user: AuthUser; tokens: AuthTokens };
+    const { user, tokens } = json.data;
 
     // Zero-trust: verify role before granting dashboard access
     if (!DASHBOARD_ROLES.includes(user.role)) {
@@ -114,8 +145,8 @@ export function DashboardAuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: state.tokens.refreshToken }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error();
+      const json = await parseJson<ApiResponse<AuthTokens>>(res);
+      if (!res.ok || !json.success) throw new Error();
       const newTokens: AuthTokens = json.data;
       persist(state.user!, newTokens);
       setState((s) => ({ ...s, tokens: newTokens }));

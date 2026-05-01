@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { apiFetch } from '../hooks/useApi';
 import type { TireType } from '@moore-tires/shared';
+import { parseJson, type ApiResponse } from '../utils/http';
 
 interface TireProduct {
   id: string;
@@ -52,10 +53,12 @@ export default function Tires() {
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
 
-  const typeFilter = (searchParams.get('type') || '') as TireType | '';
-  const sizeFilter = searchParams.get('size') || '';
-  const searchQuery = searchParams.get('search') || '';
-  const page = Number(searchParams.get('page')) || 1;
+  const typeValue = searchParams.get('type');
+  const typeFilter = (typeValue ?? '') as TireType | '';
+  const sizeFilter = searchParams.get('size') ?? '';
+  const searchQuery = searchParams.get('search') ?? '';
+  const parsedPage = Number(searchParams.get('page') ?? '1');
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -68,7 +71,7 @@ export default function Tires() {
 
     try {
       const res = await apiFetch(`/api/v1/products?${params.toString()}`);
-      const json = await res.json();
+      const json = await parseJson<ApiResponse<SearchResult>>(res);
       if (json.success) setResults(json.data);
     } catch {
       // Network error
@@ -78,7 +81,7 @@ export default function Tires() {
   }, [typeFilter, sizeFilter, searchQuery, page]);
 
   useEffect(() => {
-    fetchProducts();
+    void fetchProducts();
   }, [fetchProducts]);
 
   function setFilter(key: string, value: string) {
@@ -201,9 +204,7 @@ export default function Tires() {
                     {product.brand}
                   </p>
                   <h3 className="font-display text-lg font-semibold text-platinum-50">
-                    <Link to={`/tires/${product.id}`} className="hover:text-flame-400 transition">
-                      {product.tireModel}
-                    </Link>
+                    {product.tireModel}
                   </h3>
                   <p className="font-mono text-sm text-platinum-400">{product.formattedSize}</p>
                 </div>
@@ -216,7 +217,7 @@ export default function Tires() {
                     <span className="ml-1 text-xs text-platinum-500">retail</span>
                   </div>
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       addItem({
                         productId: product.id,
                         brand: product.brand,
@@ -224,8 +225,8 @@ export default function Tires() {
                         formattedSize: product.formattedSize,
                         unitPrice: product.baseRetailPrice,
                         image: product.images[0],
-                      })
-                    }
+                      });
+                    }}
                     className="rounded-lg bg-flame-500 px-3 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-flame-600 active:scale-95"
                   >
                     Add to Cart

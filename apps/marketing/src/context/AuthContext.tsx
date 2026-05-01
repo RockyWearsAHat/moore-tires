@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { AuthUser, AuthTokens } from '@moore-tires/shared';
+import { parseJson, type ApiResponse } from '../utils/http';
 
 interface AuthState {
   user: AuthUser | null;
@@ -29,7 +30,10 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const API = import.meta.env['VITE_API_URL'] || 'http://localhost:3001';
+const API =
+  typeof import.meta.env['VITE_API_URL'] === 'string' && import.meta.env['VITE_API_URL'].length > 0
+    ? import.meta.env['VITE_API_URL']
+    : 'http://localhost:3001';
 const STORAGE_KEY = 'moore_auth';
 
 function persistAuth(user: AuthUser, tokens: AuthTokens) {
@@ -40,11 +44,33 @@ function clearAuth() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+interface StoredAuth {
+  user: AuthUser;
+  tokens: AuthTokens;
+}
+
+function isStoredAuth(value: unknown): value is StoredAuth {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as {
+    user?: { id?: unknown; role?: unknown };
+    tokens?: { accessToken?: unknown; refreshToken?: unknown };
+  };
+
+  return (
+    typeof candidate.user?.id === 'string' &&
+    typeof candidate.user?.role === 'string' &&
+    typeof candidate.tokens?.accessToken === 'string' &&
+    typeof candidate.tokens?.refreshToken === 'string'
+  );
+}
+
 function loadAuth(): { user: AuthUser; tokens: AuthTokens } | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw) as unknown;
+    return isStoredAuth(parsed) ? parsed : null;
   } catch {
     return null;
   }
@@ -72,8 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error?.message || 'Login failed');
+    const json = await parseJson<ApiResponse<{ user: AuthUser; tokens: AuthTokens }>>(res);
+    if (!res.ok) {
+      const message = !json.success ? json.error?.message : undefined;
+      throw new Error(message ?? 'Login failed');
+    }
+    if (!json.success) throw new Error(json.error?.message ?? 'Login failed');
     const { user, tokens } = json.data;
     persistAuth(user, tokens);
     setState({ user, tokens, isLoading: false });
@@ -92,8 +122,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message || 'Registration failed');
+      const json = await parseJson<ApiResponse<{ user: AuthUser; tokens: AuthTokens }>>(res);
+      if (!res.ok) {
+        const message = !json.success ? json.error?.message : undefined;
+        throw new Error(message ?? 'Registration failed');
+      }
+      if (!json.success) throw new Error(json.error?.message ?? 'Registration failed');
       const { user, tokens } = json.data;
       persistAuth(user, tokens);
       setState({ user, tokens, isLoading: false });
@@ -125,8 +159,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: state.tokens.refreshToken }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error();
+      const json = await parseJson<ApiResponse<AuthTokens>>(res);
+      if (!res.ok || !json.success) throw new Error();
       const newTokens: AuthTokens = json.data;
       const newState = { user: state.user!, tokens: newTokens };
       persistAuth(newState.user, newState.tokens);

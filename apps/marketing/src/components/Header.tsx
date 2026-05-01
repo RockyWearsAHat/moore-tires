@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
 import { useCart } from '../context/CartContext.js';
+import { ENABLE_SERVICE_BOOKING } from '../config/features.js';
 
 const NAV_LINKS = [
   { to: '/tires', label: 'Shop Tires' },
@@ -10,7 +11,11 @@ const NAV_LINKS = [
   { to: '/contact', label: 'Contact' },
 ];
 
-export function Header() {
+interface HeaderProps {
+  theme: 'light' | 'dark';
+}
+
+export function Header({ theme }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, logout } = useAuth();
@@ -30,26 +35,21 @@ export function Header() {
           : 'bg-transparent'
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
         {/* Logo */}
         <Link
           to="/"
           className="flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-flame-500"
         >
-          <span className="flex h-9 w-9 items-center justify-center bg-flame-500">
-            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" fill="none" stroke="white" strokeWidth="2" />
-              <circle cx="12" cy="12" r="4" fill="white" />
-              <path d="M12 2 L12 6 M12 18 L12 22 M22 12 L18 12 M6 12 L2 12" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </span>
-          <span className="font-display font-extrabold text-xl uppercase tracking-widest text-platinum-50">
-            Moore <span className="text-flame-500">Tires</span>
-          </span>
+          <img
+            src={theme === 'light' ? '/moore-tire-wordmark-dark.svg' : '/moore-tire-wordmark-light.svg'}
+            alt="Moore Tire"
+            className="h-7 w-auto sm:h-8"
+          />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Main navigation">
           {NAV_LINKS.map(({ to, label }) => (
             <NavLink
               key={to}
@@ -66,7 +66,7 @@ export function Header() {
         </nav>
 
         {/* CTA + Cart + Auth + mobile menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {/* Cart icon */}
           <Link
             to="/cart"
@@ -85,12 +85,14 @@ export function Header() {
 
           {/* Auth */}
           {user ? (
-            <div className="hidden items-center gap-3 md:flex">
+            <div className="hidden items-center gap-3 xl:flex">
               <span className="text-sm text-platinum-400">
                 {user.firstName}
               </span>
               <button
-                onClick={() => logout()}
+                onClick={() => {
+                  void logout();
+                }}
                 className="ghost-btn text-sm"
               >
                 Sign Out
@@ -99,18 +101,18 @@ export function Header() {
           ) : (
             <Link
               to="/login"
-              className="ghost-btn hidden text-sm md:inline-flex"
+              className="ghost-btn hidden text-sm xl:inline-flex"
             >
               Sign In
             </Link>
           )}
 
           <Link
-            to="/book"
-            className="flame-btn hidden text-sm md:inline-flex"
-            aria-label="Book a tire service appointment"
+            to={ENABLE_SERVICE_BOOKING ? '/book' : '/tires'}
+            className="flame-btn hidden text-sm xl:inline-flex"
+            aria-label={ENABLE_SERVICE_BOOKING ? 'Book a tire service appointment' : 'Order truck tires'}
           >
-            Book Now
+            {ENABLE_SERVICE_BOOKING ? 'Book Now' : 'Order Tires'}
             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3 8h10m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -119,7 +121,7 @@ export function Header() {
           {/* Hamburger */}
           <button
             type="button"
-            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md lg:hidden"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
@@ -133,7 +135,7 @@ export function Header() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="border-t border-onyx-700 bg-onyx-900/98 pb-6 pt-2 md:hidden">
+        <div className="border-t border-onyx-700 bg-onyx-900/98 pb-6 pt-2 lg:hidden">
           <nav className="flex flex-col gap-1 px-6" aria-label="Mobile navigation">
             {NAV_LINKS.map(({ to, label }) => (
               <NavLink
@@ -142,7 +144,7 @@ export function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
                   `block py-3 font-display font-semibold text-lg uppercase tracking-widest ${
-                    isActive ? 'text-flame-400' : 'text-platinum-300'
+                    isActive ? 'text-flame-400' : 'text-platinum-400'
                   }`
                 }
               >
@@ -150,16 +152,16 @@ export function Header() {
               </NavLink>
             ))}
             <Link
-              to="/book"
+              to={ENABLE_SERVICE_BOOKING ? '/book' : '/tires'}
               onClick={() => setMenuOpen(false)}
               className="flame-btn mt-4 justify-center"
             >
-              Book Now
+              {ENABLE_SERVICE_BOOKING ? 'Book Now' : 'Order Tires'}
             </Link>
             {user ? (
               <button
                 onClick={() => {
-                  logout();
+                  void logout();
                   setMenuOpen(false);
                 }}
                 className="ghost-btn mt-2 w-full justify-center"

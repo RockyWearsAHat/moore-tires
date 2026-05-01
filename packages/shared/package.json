@@ -16,7 +16,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "clean": "rimraf dist"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ import {
   CreatePricingTierSchema,
   CreatePriceOverrideSchema,
 } from '@moore-tires/shared';
-import { requireAuth, requireRole, getAuthUser } from '../middleware/auth.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 import {
   createProduct,
   updateProduct,
@@ -38,38 +38,7 @@ productsRouter.get('/', async (req, res, next) => {
   }
 });
 
-productsRouter.get('/:id', async (req, res, next) => {
-  try {
-    const data = await getProductById(String(req.params['id'] ?? ''));
-    res.json({ success: true, data });
-  } catch (err) {
-    next(err);
-  }
-});
 
-/** Get the effective price for a product (retail or wholesale tier). */
-productsRouter.get('/:id/price', async (req, res, next) => {
-  try {
-    // Optional auth — wholesale users get tier pricing, anonymous get retail
-    let user;
-    try {
-      const authHeader = req.headers['authorization'];
-      if (authHeader?.startsWith('Bearer ')) {
-        const jwt = await import('jsonwebtoken');
-        const secret = process.env['JWT_SECRET'];
-        if (secret) {
-          user = jwt.default.verify(authHeader.slice(7), secret) as import('@moore-tires/shared').JwtPayload;
-        }
-      }
-    } catch {
-      // Invalid token → treat as anonymous
-    }
-    const data = await getEffectivePrice(String(req.params['id'] ?? ''), user);
-    res.json({ success: true, data });
-  } catch (err) {
-    next(err);
-  }
-});
 
 // ─── Admin product management ─────────────────────────────────────────────────
 
@@ -173,3 +142,36 @@ productsRouter.post(
     }
   }
 );
+
+productsRouter.get('/:id', async (req, res, next) => {
+  try {
+    const data = await getProductById(String(req.params['id'] ?? ''));
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Get the effective price for a product (retail or wholesale tier). */
+productsRouter.get('/:id/price', async (req, res, next) => {
+  try {
+    // Optional auth — wholesale users get tier pricing, anonymous get retail
+    let user;
+    try {
+      const authHeader = req.headers['authorization'];
+      if (authHeader?.startsWith('Bearer ')) {
+        const jwt = await import('jsonwebtoken');
+        const secret = process.env['JWT_SECRET'];
+        if (secret) {
+          user = jwt.default.verify(authHeader.slice(7), secret) as import('@moore-tires/shared').JwtPayload;
+        }
+      }
+    } catch {
+      // Invalid token → treat as anonymous
+    }
+    const data = await getEffectivePrice(String(req.params['id'] ?? ''), user);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});

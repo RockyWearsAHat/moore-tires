@@ -1,6 +1,9 @@
 import { useDashboardAuth } from '../context/DashboardAuthContext';
 
-const API = import.meta.env['VITE_API_URL'] || 'http://localhost:3001';
+const API =
+  typeof import.meta.env['VITE_API_URL'] === 'string' && import.meta.env['VITE_API_URL'].length > 0
+    ? import.meta.env['VITE_API_URL']
+    : 'http://localhost:3001';
 
 /** Authenticated fetch for the dashboard. Auto-refreshes on 401. */
 export function useDashboardApi() {

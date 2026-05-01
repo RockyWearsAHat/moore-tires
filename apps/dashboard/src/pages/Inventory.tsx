@@ -40,11 +40,13 @@ export function InventoryPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const isAdmin = user?.role === 'admin';
 
   const loadData = async () => {
+    setError(null);
     try {
       const [invRes, alertRes] = await Promise.all([
         apiFetch('/api/v1/inventory'),
@@ -58,6 +60,8 @@ export function InventoryPage() {
         const json = await alertRes.json() as { data: InventoryItem[] };
         setAlerts(json.data);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load inventory data.');
     } finally {
       setLoading(false);
     }
@@ -103,14 +107,31 @@ export function InventoryPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full p-8">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-6 text-center">
+          <p className="text-sm text-red-400 mb-3">{error}</p>
+          <button
+            type="button"
+            onClick={() => void loadData()}
+            className="rounded bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-400 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center justify-between border-b border-surface-border bg-[#0D0F14] px-6 py-4">
+      <header className="page-header flex items-center justify-between px-6 py-4">
         <div>
-          <h1 className="font-display font-bold text-xl uppercase tracking-wider text-gray-100">
+          <h1 className="font-display theme-text-strong text-xl font-bold uppercase tracking-wider">
             Inventory
           </h1>
-          <p className="text-xs text-gray-500">
+          <p className="theme-text-faint text-xs">
             {isAdmin ? 'All accounts — stock levels' : 'Your warehouse stock levels'}
           </p>
         </div>
@@ -126,10 +147,10 @@ export function InventoryPage() {
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Upload Section */}
         <div className="card p-4">
-          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-gray-300 mb-3">
+          <h2 className="font-display theme-text-body mb-3 text-sm font-bold uppercase tracking-wider">
             Upload Inventory CSV
           </h2>
-          <p className="text-xs text-gray-500 mb-3">
+          <p className="theme-text-faint mb-3 text-xs">
             Columns: productId, currentQuantity, reorderThreshold, targetQuantity
           </p>
           <div className="flex items-center gap-3">
@@ -137,13 +158,13 @@ export function InventoryPage() {
               ref={fileRef}
               type="file"
               accept=".csv"
-              className="text-sm text-gray-400 file:mr-3 file:px-3 file:py-1.5 file:rounded file:border-0 file:bg-brand-500 file:text-xs file:font-semibold file:text-white file:cursor-pointer hover:file:bg-brand-400"
+              className="theme-text-muted text-sm file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-brand-400"
             />
             <button
               type="button"
               onClick={() => void handleCsvUpload()}
               disabled={uploading}
-              className="rounded bg-brand-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-brand-400 disabled:opacity-50 transition-colors"
+              className="theme-button-primary rounded px-4 py-1.5 text-xs font-semibold disabled:opacity-50"
             >
               {uploading ? 'Uploading…' : 'Upload'}
             </button>
@@ -207,10 +228,10 @@ export function InventoryPage() {
                       <td className="px-4 py-3 text-right font-mono text-gray-300">
                         {item.currentQuantity}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-500">
+                      <td className="theme-text-faint px-4 py-3 text-right font-mono">
                         {item.reorderThreshold}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-gray-500">
+                      <td className="theme-text-faint px-4 py-3 text-right font-mono">
                         {item.targetQuantity}
                       </td>
                       <td className="px-4 py-3 text-center">

@@ -27,7 +27,7 @@ const AppointmentSchema = new Schema<IAppointment>(
     toJSON: {
       virtuals: true,
       transform(_doc, ret) {
-        ret['id'] = (ret['_id'] as Types.ObjectId).toString();
+        ret.id = String(ret._id);
         Reflect.deleteProperty(ret, '_id');
         Reflect.deleteProperty(ret, '__v');
       },

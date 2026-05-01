@@ -1,6 +1,15 @@
 import { useAuth } from '../context/AuthContext';
 
-const API = import.meta.env['VITE_API_URL'] || 'http://localhost:3001';
+const API =
+  typeof import.meta.env['VITE_API_URL'] === 'string' && import.meta.env['VITE_API_URL'].length > 0
+    ? import.meta.env['VITE_API_URL']
+    : 'http://localhost:3001';
+
+interface StoredAuth {
+  tokens?: {
+    accessToken?: string;
+  };
+}
 
 /** Fetch wrapper that attaches JWT and handles token refresh on 401. */
 export async function apiFetch(
@@ -28,7 +37,8 @@ export function useApiFetch() {
     if (res.status === 401 && tokens?.refreshToken) {
       await refreshToken();
       const stored = localStorage.getItem('moore_auth');
-      const newToken = stored ? JSON.parse(stored).tokens?.accessToken : null;
+      const parsed = stored ? (JSON.parse(stored) as StoredAuth) : null;
+      const newToken = parsed?.tokens?.accessToken ?? null;
       if (newToken) {
         res = await apiFetch(path, options, newToken);
       }

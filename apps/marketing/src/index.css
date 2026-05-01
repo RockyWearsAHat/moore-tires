@@ -1,10 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ── Base styles ─────────────────────────────────────────────────────────────── */
 @layer base {
+  :root {
+    /* Dark theme defaults (fallback / rarely used — site defaults to light) */
+    --mk-onyx-950: #060a14;
+    --mk-onyx-900: #0a1122;
+    --mk-onyx-800: #0e1730;
+    --mk-onyx-700: #162040;
+    --mk-onyx-600: #1e2d52;
+    --mk-platinum-50: #eef7ff;
+    --mk-platinum-100: #c8def3;
+    --mk-platinum-200: #8fb2cf;
+    --mk-platinum-400: #6080a8;
+    --mk-platinum-600: #4060a0;
+    --mk-flame-400: #60b8ff;
+    --mk-flame-500: #3a90ff;
+    --mk-flame-600: #2a7fda;
+    --mk-flame-700: #1e64be;
+  }
+
+  :root[data-theme='light'] {
+    --mk-onyx-950: #f0f6ff;
+    --mk-onyx-900: #e8f1ff;
+    --mk-onyx-800: #dce8ff;
+    --mk-onyx-700: #c4d6f0;
+    --mk-onyx-600: #a4bde0;
+    --mk-platinum-50: #0b1e38;
+    --mk-platinum-100: #18304e;
+    --mk-platinum-200: #274a6e;
+    --mk-platinum-400: #5070a0;
+    --mk-platinum-600: #7a96c0;
+    --mk-flame-400: #5aadff;
+    --mk-flame-500: #2a7fda;
+    --mk-flame-600: #1e64be;
+    --mk-flame-700: #1850a0;
+  }
+
   *, *::before, *::after {
     box-sizing: border-box;
   }
@@ -17,10 +52,12 @@
 
   body {
     @apply bg-onyx-900 text-platinum-100 font-body;
+    overflow-x: hidden;
     background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(255, 85, 0, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 100%, rgba(255, 85, 0, 0.04) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 0%, rgba(42, 127, 218, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(26, 80, 160, 0.05) 0%, transparent 50%);
     background-attachment: fixed;
+    transition: background-color 220ms ease, color 220ms ease;
   }
 
   ::selection {
@@ -31,19 +68,19 @@
 /* ── Typography utilities ────────────────────────────────────────────────────── */
 @layer components {
   .display-xl {
-    @apply font-display text-[clamp(4rem,12vw,10rem)] font-black leading-[0.88] tracking-tight uppercase;
+    @apply font-display text-[clamp(2.8rem,7vw,6rem)] font-extrabold leading-[1.04] tracking-tight;
   }
 
   .display-lg {
-    @apply font-display text-[clamp(2.5rem,7vw,5.5rem)] font-extrabold leading-[0.9] tracking-tight uppercase;
+    @apply font-display text-[clamp(2rem,5vw,4rem)] font-extrabold leading-[1.1] tracking-tight;
   }
 
   .display-md {
-    @apply font-display text-[clamp(1.75rem,4vw,3rem)] font-bold leading-tight uppercase;
+    @apply font-display text-[clamp(1.5rem,3vw,2.5rem)] font-bold leading-snug;
   }
 
   .section-label {
-    @apply text-xs font-semibold tracking-[0.25em] uppercase text-flame-500;
+    @apply text-xs font-semibold tracking-[0.22em] uppercase text-flame-500;
   }
 
   .body-lg {
@@ -58,18 +95,23 @@
   }
 
   .flame-btn {
-    @apply inline-flex items-center gap-3 bg-flame-500 hover:bg-flame-600 active:bg-flame-700
-           text-white font-display font-bold uppercase tracking-widest
+    @apply inline-flex items-center gap-3 rounded-lg bg-flame-500 hover:bg-flame-600 active:bg-flame-700
+           text-white font-display font-semibold tracking-wide
            px-8 py-4 text-base transition-all duration-200
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-flame-400
-           focus-visible:ring-offset-4 focus-visible:ring-offset-onyx-900;
+           focus-visible:ring-offset-2 focus-visible:ring-offset-onyx-900;
   }
 
   .ghost-btn {
-    @apply inline-flex items-center gap-3 border border-platinum-400/30
-           hover:border-flame-500 text-platinum-200 hover:text-flame-400
-           font-display font-bold uppercase tracking-widest
+    @apply inline-flex items-center gap-3 rounded-lg border border-platinum-50/30
+           hover:border-flame-500 text-platinum-50 hover:text-flame-500
+           font-display font-semibold tracking-wide
            px-8 py-4 text-base transition-all duration-200;
+    background-color: transparent;
+  }
+
+  .ghost-btn:hover {
+    background-color: color-mix(in srgb, #2a7fda 8%, transparent);
   }
 }
 
@@ -78,8 +120,8 @@
   .tread-overlay {
     background-image: repeating-linear-gradient(
       90deg,
-      rgba(255, 85, 0, 0.03) 0px,
-      rgba(255, 85, 0, 0.03) 2px,
+      rgba(42, 127, 218, 0.03) 0px,
+      rgba(42, 127, 218, 0.03) 2px,
       transparent 2px,
       transparent 40px
     );
@@ -97,3 +139,33 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Theme-aware utility overrides for runtime light/dark switching */
+.bg-onyx-950 { background-color: var(--mk-onyx-950) !important; }
+.bg-onyx-900 { background-color: var(--mk-onyx-900) !important; }
+.bg-onyx-800 { background-color: var(--mk-onyx-800) !important; }
+.bg-onyx-700 { background-color: var(--mk-onyx-700) !important; }
+
+.border-onyx-700 { border-color: var(--mk-onyx-700) !important; }
+.border-onyx-600 { border-color: var(--mk-onyx-600) !important; }
+
+.text-platinum-50 { color: var(--mk-platinum-50) !important; }
+.text-platinum-100 { color: var(--mk-platinum-100) !important; }
+.text-platinum-200 { color: var(--mk-platinum-200) !important; }
+.text-platinum-400 { color: var(--mk-platinum-400) !important; }
+.text-platinum-600 { color: var(--mk-platinum-600) !important; }
+
+.bg-flame-500 { background-color: var(--mk-flame-500) !important; }
+.text-flame-400 { color: var(--mk-flame-400) !important; }
+.text-flame-500 { color: var(--mk-flame-500) !important; }
+.border-flame-500 { border-color: var(--mk-flame-500) !important; }
+.hover\:bg-flame-600:hover { background-color: var(--mk-flame-600) !important; }
+.hover\:text-flame-400:hover { color: var(--mk-flame-400) !important; }
+
+.bg-onyx-900\/98 { background-color: color-mix(in srgb, var(--mk-onyx-900) 98%, transparent) !important; }
+.bg-onyx-900\/95 { background-color: color-mix(in srgb, var(--mk-onyx-900) 95%, transparent) !important; }
+.bg-onyx-900\/60 { background-color: color-mix(in srgb, var(--mk-onyx-900) 60%, transparent) !important; }
+.bg-onyx-900\/40 { background-color: color-mix(in srgb, var(--mk-onyx-900) 40%, transparent) !important; }
+.bg-onyx-950\/50 { background-color: color-mix(in srgb, var(--mk-onyx-950) 50%, transparent) !important; }
+
+:root[data-theme='light'] .text-onyx-600 { color: color-mix(in srgb, var(--mk-platinum-600) 70%, #ffffff) !important; }

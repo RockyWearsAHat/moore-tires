@@ -1,47 +1,64 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../src/theme';
 
-function TabIcon({ label, focused }: { label: string; focused: boolean }) {
-  const icons: Record<string, string> = { Home: '◌', Jobs: '◈', Tires: '◎', Book: '+', Account: '⚙' };
-  return (
-    <Text style={{ fontSize: 18, color: focused ? '#FF5500' : '#6B6860' }}>
-      {icons[label] ?? '○'}
-    </Text>
-  );
-}
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const SCREENS: Array<{
+  name: string;
+  title: string;
+  icon: IoniconName;
+  iconAlt: IoniconName;
+}> = [
+  { name: 'index',   title: 'Home',    icon: 'home',       iconAlt: 'home-outline' },
+  { name: 'tires',   title: 'Tires',   icon: 'car',        iconAlt: 'car-outline' },
+  { name: 'jobs',    title: 'My Jobs', icon: 'briefcase',  iconAlt: 'briefcase-outline' },
+  { name: 'book',    title: 'Book',    icon: 'calendar',   iconAlt: 'calendar-outline' },
+  { name: 'account', title: 'Account', icon: 'person',     iconAlt: 'person-outline' },
+];
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: { backgroundColor: '#131318', borderTopColor: '#1D1D26', borderTopWidth: 1 },
-        tabBarActiveTintColor: '#FF5500',
-        tabBarInactiveTintColor: '#6B6860',
-        headerStyle: { backgroundColor: '#0C0C12' },
-        headerTintColor: '#FFFCF8',
-        headerTitleStyle: { fontWeight: '700' as const },
+        tabBarStyle: {
+          backgroundColor: colors.onyx[800],
+          borderTopColor: colors.onyx[700],
+          borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 82 : 62,
+          paddingBottom: Platform.OS === 'ios' ? 22 : 6,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: colors.flame[500],
+        tabBarInactiveTintColor: colors.platinum[600],
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '600' as const,
+          letterSpacing: 0.5,
+        },
+        headerStyle: { backgroundColor: colors.onyx[900] },
+        headerTintColor: colors.platinum[50],
+        headerTitleStyle: { fontWeight: '800' as const, fontSize: 16 },
+        headerShadowVisible: false,
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{ title: 'Home', tabBarIcon: ({ focused }) => <TabIcon label="Home" focused={focused} /> }}
-      />
-      <Tabs.Screen
-        name="tires"
-        options={{ title: 'Tires', tabBarIcon: ({ focused }) => <TabIcon label="Tires" focused={focused} /> }}
-      />
-      <Tabs.Screen
-        name="jobs"
-        options={{ title: 'My Jobs', tabBarIcon: ({ focused }) => <TabIcon label="Jobs" focused={focused} /> }}
-      />
-      <Tabs.Screen
-        name="book"
-        options={{ title: 'Book', tabBarIcon: ({ focused }) => <TabIcon label="Book" focused={focused} /> }}
-      />
-      <Tabs.Screen
-        name="account"
-        options={{ title: 'Account', tabBarIcon: ({ focused }) => <TabIcon label="Account" focused={focused} /> }}
-      />
+      {SCREENS.map(({ name, title, icon, iconAlt }) => (
+        <Tabs.Screen
+          key={name}
+          name={name}
+          options={{
+            title,
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons
+                name={focused ? icon : iconAlt}
+                size={22}
+                color={color}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }

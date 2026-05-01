@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Moore Tire favicon">
+  <rect x="1.8" y="1.8" width="60.4" height="60.4" rx="12.8" fill="#032760"/>
+  <rect x="1.8" y="1.8" width="60.4" height="60.4" rx="12.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.6"/>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 24H22" stroke-width="4"/>
+    <path d="M10 32H20" stroke-width="4"/>
+    <path d="M12 40H22" stroke-width="4"/>
+    <path d="M21 20C26.8 21.9 30.3 26.1 31.4 32C30.3 37.9 26.8 42.1 21 44" stroke-width="4.2"/>
+    <path d="M26.8 15.9C33.9 19.6 38.4 25 40 32C38.4 39 33.9 44.4 26.8 48.1" stroke-width="3.9"/>
+    <path d="M33.2 12.4C41.4 17.2 46.3 23.8 48 32C46.3 40.2 41.4 46.8 33.2 51.6" stroke-width="3.6"/>
+    <path d="M39.8 9.6C48.7 15.1 53.9 22.8 55.6 32C53.9 41.2 48.7 48.9 39.8 54.4" stroke-width="3.3"/>
+  </g>
+</svg>

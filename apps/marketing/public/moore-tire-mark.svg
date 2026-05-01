@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Moore Tire logo mark">
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 24H20" stroke-width="4"/>
+    <path d="M8 32H18" stroke-width="4"/>
+    <path d="M10 40H20" stroke-width="4"/>
+    <path d="M19 20C24.8 21.9 28.3 26.1 29.4 32C28.3 37.9 24.8 42.1 19 44" stroke-width="4.2"/>
+    <path d="M24.8 15.9C31.9 19.6 36.4 25 38 32C36.4 39 31.9 44.4 24.8 48.1" stroke-width="3.9"/>
+    <path d="M31.2 12.4C39.4 17.2 44.3 23.8 46 32C44.3 40.2 39.4 46.8 31.2 51.6" stroke-width="3.6"/>
+    <path d="M37.8 9.6C46.7 15.1 51.9 22.8 53.6 32C51.9 41.2 46.7 48.9 37.8 54.4" stroke-width="3.3"/>
+  </g>
+</svg>

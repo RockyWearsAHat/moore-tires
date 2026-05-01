@@ -65,10 +65,10 @@ export function InboxPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex items-center justify-between border-b border-surface-border bg-[#0D0F14] px-6 py-4">
+      <header className="page-header flex items-center justify-between px-6 py-4">
         <div>
-          <h1 className="font-display font-bold text-xl uppercase tracking-wider text-gray-100">Inbox</h1>
-          <p className="text-xs text-gray-500">Pending service requests</p>
+          <h1 className="font-display theme-text-strong text-xl font-bold uppercase tracking-wider">Inbox</h1>
+          <p className="theme-text-faint text-xs">Pending service requests</p>
         </div>
         <span className="rounded bg-brand-500/10 px-2 py-1 text-xs font-semibold text-brand-400">
           {requests.length} pending
@@ -89,11 +89,11 @@ export function InboxPage() {
               <div key={req.id} className="card flex flex-col gap-3 p-4 hover:border-brand-500/30 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-medium text-gray-100">{req.fullName}</p>
-                    <p className="text-xs text-gray-500">{req.phone}</p>
+                    <p className="theme-text-strong font-medium">{req.fullName}</p>
+                    <p className="theme-text-faint text-xs">{req.phone}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-xs text-gray-400">
+                    <p className="theme-text-muted text-xs">
                       {new Date(req.preferredDate).toLocaleDateString()} · {req.preferredTimeWindow.replace(/_/g, ' ')}
                     </p>
                     {req.isMobileService && (
@@ -103,24 +103,24 @@ export function InboxPage() {
                     )}
                   </div>
                 </div>
-                <p className="text-sm text-gray-300">
+                <p className="theme-text-body text-sm">
                   {req.vehicleYear} {req.vehicleMake} {req.vehicleModel} — {req.serviceType.replace(/_/g, ' ')}
                 </p>
                 {req.notes && (
-                  <p className="text-xs text-gray-600 border-t border-surface-border pt-2">{req.notes}</p>
+                  <p className="theme-text-faint border-t border-surface-border pt-2 text-xs">{req.notes}</p>
                 )}
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => void scheduleRequest(req.id)}
-                    className="rounded bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-400 transition-colors"
+                    className="theme-button-primary rounded px-3 py-1.5 text-xs font-semibold"
                   >
                     Schedule
                   </button>
                   <button
                     type="button"
                     onClick={() => void dismissRequest(req.id)}
-                    className="rounded border border-surface-border px-3 py-1.5 text-xs font-semibold text-gray-400 hover:text-gray-100 transition-colors"
+                    className="theme-button-secondary rounded px-3 py-1.5 text-xs font-semibold"
                   >
                     Dismiss
                   </button>

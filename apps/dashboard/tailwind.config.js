@@ -5,15 +5,16 @@ export default {
     extend: {
       colors: {
         surface: {
-          base: '#0B0D11',
-          card: '#111318',
-          elevated: '#181B22',
-          border: '#1F2330',
+          base:     'var(--surface-base)',
+          sidebar:  'var(--surface-sidebar)',
+          card:     'var(--surface-card)',
+          elevated: 'var(--surface-elevated)',
+          border:   'var(--surface-border)',
         },
         brand: {
-          500: '#FF5500',
-          400: '#FF7733',
-          300: '#FF9966',
+          500: 'var(--brand)',
+          400: 'var(--brand-strong)',
+          300: 'var(--brand-alt)',
         },
         status: {
           scheduled: '#3B82F6',
@@ -24,8 +25,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
-        display: ['"Barlow Condensed"', 'sans-serif'],
+        sans: ['"Manrope"', '"Avenir Next"', '"Segoe UI"', 'sans-serif'],
+        display: ['"Space Grotesk"', '"Avenir Next"', '"Segoe UI"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
     },

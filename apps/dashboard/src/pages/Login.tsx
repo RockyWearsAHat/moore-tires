@@ -3,6 +3,11 @@ import { useDashboardAuth } from '../context/DashboardAuthContext';
 
 export function LoginPage() {
   const { login } = useDashboardAuth();
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('dashboard-theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return document.documentElement.dataset['theme'] === 'dark' ? 'dark' : 'light';
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,23 +27,76 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface-base px-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="mb-8 flex items-center justify-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center bg-brand-500 text-white text-lg font-bold font-display">
-            M
-          </span>
-          <span className="font-display font-bold text-xl uppercase tracking-widest text-gray-100">
-            Moore <span className="text-brand-500">Ops</span>
-          </span>
-        </div>
+    <div className="min-h-screen bg-surface-base px-4 py-8">
+      <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <section
+          className="rounded-2xl p-8 lg:p-10"
+          style={{
+            background: 'linear-gradient(160deg, rgba(7,27,61,0.95) 0%, rgba(10,31,75,0.9) 100%)',
+            border: '1px solid rgba(122,173,255,0.24)',
+            boxShadow: '0 24px 56px rgba(4, 12, 28, 0.35)',
+          }}
+        >
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200/70">Moore Tire</p>
+              <h1 className="mt-2 text-3xl font-black text-white" style={{ fontFamily: 'var(--font-display)' }}>
+                Internal Ops Portal
+              </h1>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const next = theme === 'dark' ? 'light' : 'dark';
+                setTheme(next);
+                document.documentElement.dataset['theme'] = next;
+                localStorage.setItem('dashboard-theme', next);
+              }}
+              className="theme-button-secondary rounded-lg px-3 py-1.5 text-xs font-semibold"
+            >
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </button>
+          </div>
 
-        <div className="card p-6">
-          <h1 className="font-display text-xl font-bold uppercase tracking-wide text-gray-100">
+          <p className="max-w-md text-sm leading-relaxed text-blue-100/80">
+            Dispatch, sourcing, route planning, and fulfillment monitoring for authorized Moore Tire team members.
+          </p>
+
+          <div className="mt-8 grid grid-cols-2 gap-3">
+            {[
+              { label: 'Orders Awaiting Dispatch', value: '26' },
+              { label: 'Deliveries In Progress', value: '38' },
+              { label: 'Urgent Stockouts', value: '9' },
+              { label: 'Available Fleet', value: '14 / 52' },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl px-4 py-3"
+                style={{ border: '1px solid rgba(157, 199, 255, 0.24)', background: 'rgba(255,255,255,0.06)' }}
+              >
+                <p className="text-[11px] text-blue-100/70">{item.label}</p>
+                <p className="mt-1 text-xl font-bold text-white">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="w-full rounded-2xl card p-6 lg:p-8">
+          <div className="mb-6 flex items-center justify-center">
+            <img
+              src={theme === 'light' ? '/moore-tire-lockup-internal-dark.svg' : '/moore-tire-lockup-internal-light.svg'}
+              alt="Moore Tire Internal Ops Portal"
+              className="h-14 w-auto"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/moore-tire-lockup-internal-light.svg';
+              }}
+            />
+          </div>
+
+          <h2 className="font-display theme-text-strong text-xl font-bold uppercase tracking-wide">
             Admin Login
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          </h2>
+          <p className="theme-text-faint mt-1 text-sm">
             Authorized personnel only. No public sign-up.
           </p>
 
@@ -50,7 +108,7 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-400">
+              <label htmlFor="email" className="theme-text-muted block text-sm font-medium">
                 Email
               </label>
               <input
@@ -60,13 +118,13 @@ export function LoginPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2.5 text-gray-100 placeholder-gray-600 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
+                className="theme-input mt-1 block w-full rounded-lg px-3 py-2.5"
                 placeholder="admin@mooretires.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-400">
+              <label htmlFor="password" className="theme-text-muted block text-sm font-medium">
                 Password
               </label>
               <input
@@ -76,7 +134,7 @@ export function LoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2.5 text-gray-100 placeholder-gray-600 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
+                className="theme-input mt-1 block w-full rounded-lg px-3 py-2.5"
                 placeholder="••••••••"
               />
             </div>
@@ -84,7 +142,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-brand-400 disabled:opacity-50"
+              className="theme-button-primary flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold uppercase tracking-wider disabled:opacity-50"
             >
               {loading ? (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -92,11 +150,11 @@ export function LoginPage() {
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
-        </div>
 
-        <p className="mt-4 text-center text-xs text-gray-600">
-          Access is by invitation only. Contact your administrator.
-        </p>
+          <p className="theme-text-faint mt-4 text-center text-xs">
+            Access is by invitation only. Contact your administrator.
+          </p>
+        </section>
       </div>
     </div>
   );

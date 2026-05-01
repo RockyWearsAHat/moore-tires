@@ -1,4 +1,42 @@
+import { useState } from 'react';
+
 export function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      // In production this would POST to /api/v1/contact.
+      // For now simulate a network delay so the UI states are exercised.
+      await new Promise<void>((res) => setTimeout(res, 800));
+      setStatus('sent');
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  const field = (
+    id: keyof typeof form,
+    label: string,
+    type: string = 'text',
+    placeholder: string = ''
+  ) => (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="section-label">{label}</label>
+      <input
+        id={id}
+        type={type}
+        value={form[id]}
+        onChange={(e) => setForm((f) => ({ ...f, [id]: e.target.value }))}
+        placeholder={placeholder}
+        required
+        className="border border-onyx-700 bg-onyx-900 px-4 py-3 text-sm text-platinum-100 placeholder:text-platinum-700 outline-none focus:border-flame-500 transition-colors"
+      />
+    </div>
+  );
+
   return (
     <div className="min-h-screen pt-24 pb-20">
       <div className="relative overflow-hidden border-b border-onyx-700 py-20">
@@ -49,13 +87,62 @@ export function Contact() {
             ))}
           </div>
 
-          {/* Map placeholder */}
-          <div className="min-h-64 border border-onyx-700 bg-onyx-800 flex items-center justify-center">
-            <div className="text-center">
-              <p className="font-display font-bold text-platinum-600 uppercase tracking-widest">Map</p>
-              <p className="text-xs text-onyx-600 mt-1">Google Maps embed goes here</p>
+          {/* Contact form */}
+          {status === 'sent' ? (
+            <div className="flex items-center justify-center border border-onyx-700 bg-onyx-900 p-12">
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center bg-flame-500">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="white" strokeWidth="2.5" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <h2 className="font-display text-xl font-bold text-platinum-50">Message Sent</h2>
+                <p className="mt-2 text-sm text-platinum-600">We'll reply within 2 business hours.</p>
+                <button
+                  type="button"
+                  onClick={() => { setStatus('idle'); setForm({ name: '', email: '', phone: '', message: '' }); }}
+                  className="mt-6 border border-onyx-600 px-6 py-2 text-sm text-platinum-400 hover:text-platinum-100 hover:border-onyx-500 transition-colors"
+                >
+                  Send Another
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-5 border border-onyx-700 bg-onyx-900 p-8" noValidate>
+              <h2 className="font-display text-lg font-bold uppercase tracking-wider text-platinum-50">
+                Send a Message
+              </h2>
+
+              {field('name', 'Full Name', 'text', 'Jane Smith')}
+              {field('email', 'Email Address', 'email', 'jane@example.com')}
+              {field('phone', 'Phone Number', 'tel', '(555) 000-0000')}
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="message" className="section-label">Message</label>
+                <textarea
+                  id="message"
+                  rows={5}
+                  value={form.message}
+                  onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                  placeholder="Tell us how we can help…"
+                  required
+                  className="border border-onyx-700 bg-onyx-900 px-4 py-3 text-sm text-platinum-100 placeholder:text-platinum-700 outline-none focus:border-flame-500 transition-colors resize-none"
+                />
+              </div>
+
+              {status === 'error' && (
+                <p className="text-xs text-red-400">Something went wrong — please try again or call us directly.</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={status === 'sending'}
+                className="mt-2 bg-flame-500 px-8 py-3 font-display text-sm font-bold uppercase tracking-wider text-white hover:bg-flame-600 active:scale-[0.98] disabled:opacity-60 transition"
+              >
+                {status === 'sending' ? 'Sending…' : 'Send Message'}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

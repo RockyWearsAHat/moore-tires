@@ -8,23 +8,6 @@ import { AppError } from '../errors.js';
 export const checkoutRouter: Router = Router();
 
 /**
- * POST /api/v1/checkout/:orderId
- * Auth: logged-in user — initiate payment for an order.
- */
-checkoutRouter.post('/:orderId', requireAuth, async (req, res, next) => {
-  try {
-    const user = getAuthUser(req);
-    const result = await createCheckoutSession(
-      String(req.params['orderId'] ?? ''),
-      user
-    );
-    res.json({ success: true, data: result });
-  } catch (err) {
-    next(err);
-  }
-});
-
-/**
  * POST /api/v1/checkout/webhook
  * Stripe webhook endpoint — no auth (signature-validated internally).
  */
@@ -80,3 +63,20 @@ checkoutRouter.get(
     }
   }
 );
+
+/**
+ * POST /api/v1/checkout/:orderId
+ * Auth: logged-in user — initiate payment for an order.
+ */
+checkoutRouter.post('/:orderId', requireAuth, async (req, res, next) => {
+  try {
+    const user = getAuthUser(req);
+    const result = await createCheckoutSession(
+      String(req.params['orderId'] ?? ''),
+      user
+    );
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+});

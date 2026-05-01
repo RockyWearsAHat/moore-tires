@@ -1,7 +1,17 @@
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { ComponentProps } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useMobileAuth } from '../../src/context/AuthContext';
-import { colors, spacing, typography } from '../../src/theme';
+import { colors, radii, shadow, spacing, typography } from '../../src/theme';
+
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
+
+interface MenuItem {
+  icon: IoniconName;
+  label: string;
+  onPress: () => void;
+}
 
 export default function AccountScreen() {
   const { user, loading, logout } = useMobileAuth();
@@ -9,7 +19,7 @@ export default function AccountScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text style={styles.loadingText}>Loading…</Text>
+        <ActivityIndicator color={colors.flame[500]} size="large" />
       </View>
     );
   }
@@ -17,61 +27,76 @@ export default function AccountScreen() {
   if (!user) {
     return (
       <View style={styles.center}>
-        <Text style={styles.icon}>🔒</Text>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>
+        <View style={styles.lockCircle}>
+          <Ionicons name="lock-closed" size={28} color={colors.flame[500]} />
+        </View>
+        <Text style={styles.guestTitle}>Sign In</Text>
+        <Text style={styles.guestSubtitle}>
           Log in to view your orders, manage inventory, and place new orders.
         </Text>
         <TouchableOpacity
           style={styles.primaryBtn}
           onPress={() => router.push('/login')}
           activeOpacity={0.85}
+          accessibilityRole="button"
         >
+          <Ionicons name="log-in-outline" size={16} color="#FFF" />
           <Text style={styles.primaryBtnText}>Sign In</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const menuItems: MenuItem[] = [
+    { icon: 'receipt-outline', label: 'My Orders', onPress: () => router.push('/(tabs)/jobs') },
+    ...(user.wholesaleAccountId
+      ? [{ icon: 'stats-chart-outline' as IoniconName, label: 'Inventory', onPress: () => router.push('/(tabs)/tires') }]
+      : []),
+    { icon: 'car-sport-outline', label: 'Shop Tires', onPress: () => router.push('/(tabs)/tires') },
+    { icon: 'calendar-outline', label: 'Book Service', onPress: () => router.push('/(tabs)/book') },
+  ];
+
+  const initials = `${user.firstName[0]}${user.lastName[0]}`;
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Profile card */}
-      <View style={styles.card}>
+      <View style={[styles.profileCard, shadow.card]}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user.firstName[0]}{user.lastName[0]}
-          </Text>
+          <Text style={styles.avatarText}>{initials}</Text>
         </View>
-        <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
-        <Text style={styles.email}>{user.email}</Text>
-        <View style={styles.roleBadge}>
-          <Text style={styles.roleText}>{user.role.replace(/_/g, ' ')}</Text>
+        <View style={styles.profileInfo}>
+          <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
+          <Text style={styles.email}>{user.email}</Text>
+          <View style={styles.rolePill}>
+            <Text style={styles.roleText}>{user.role.replace(/_/g, ' ')}</Text>
+          </View>
         </View>
       </View>
 
       {/* Quick actions */}
-      <View style={styles.section}>
+      <View style={styles.sectionGroup}>
         <Text style={styles.sectionLabel}>Quick Actions</Text>
-
-        <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
-          <Text style={styles.menuIcon}>📦</Text>
-          <Text style={styles.menuText}>My Orders</Text>
-          <Text style={styles.menuArrow}>›</Text>
-        </TouchableOpacity>
-
-        {user.wholesaleAccountId && (
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
-            <Text style={styles.menuIcon}>📊</Text>
-            <Text style={styles.menuText}>Inventory</Text>
-            <Text style={styles.menuArrow}>›</Text>
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
-          <Text style={styles.menuIcon}>🛞</Text>
-          <Text style={styles.menuText}>Shop Tires</Text>
-          <Text style={styles.menuArrow}>›</Text>
-        </TouchableOpacity>
+        <View style={[styles.menuGroup, shadow.card]}>
+          {menuItems.map((item, i) => (
+            <View key={item.label}>
+              {i > 0 && <View style={styles.divider} />}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={item.onPress}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel={item.label}
+              >
+                <View style={styles.menuIconWrap}>
+                  <Ionicons name={item.icon} size={18} color={colors.flame[500]} />
+                </View>
+                <Text style={styles.menuText}>{item.label}</Text>
+                <Ionicons name="chevron-forward" size={14} color={colors.platinum[700]} />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
       </View>
 
       {/* Sign out */}
@@ -79,7 +104,10 @@ export default function AccountScreen() {
         style={styles.logoutBtn}
         onPress={() => void logout()}
         activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel="Sign out"
       >
+        <Ionicons name="log-out-outline" size={16} color="#EF4444" />
         <Text style={styles.logoutText}>Sign Out</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -95,73 +123,109 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xl,
+    gap: spacing.md,
   },
-  loadingText: { ...typography.body, color: colors.platinum[600] },
-  icon: { fontSize: 48, marginBottom: spacing.md },
-  title: { ...typography.displayMd, color: colors.platinum[50], marginBottom: spacing.xs },
-  subtitle: {
+
+  lockCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.flame[500] + '1A',
+    borderWidth: 1,
+    borderColor: colors.flame[500] + '55',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestTitle: { ...typography.displayMd, color: colors.platinum[50] },
+  guestSubtitle: {
     ...typography.body,
     color: colors.platinum[400],
     textAlign: 'center',
-    marginBottom: spacing.lg,
   },
   primaryBtn: {
     backgroundColor: colors.flame[500],
+    borderRadius: radii.sm,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   },
   primaryBtnText: { ...typography.label, color: '#FFFFFF', fontSize: 13 },
-  card: {
+
+  profileCard: {
     backgroundColor: colors.onyx[800],
+    borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: colors.onyx[700],
     padding: spacing.lg,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.md,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: colors.flame[500],
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    borderWidth: 2,
+    borderColor: colors.flame[600],
   },
-  avatarText: { color: '#FFFFFF', fontWeight: '800', fontSize: 20 },
-  name: { ...typography.displayMd, color: colors.platinum[50], fontSize: 20 },
+  avatarText: { color: '#FFFFFF', fontWeight: '800', fontSize: 22 },
+  profileInfo: { flex: 1, gap: 3 },
+  name: { ...typography.displaySm, color: colors.platinum[50], fontSize: 19 },
   email: { ...typography.small, color: colors.platinum[400] },
-  roleBadge: {
+  rolePill: {
+    alignSelf: 'flex-start',
     backgroundColor: colors.flame[500] + '1A',
     borderWidth: 1,
     borderColor: colors.flame[500] + '4D',
-    paddingHorizontal: 10,
+    borderRadius: radii.pill,
+    paddingHorizontal: 8,
     paddingVertical: 3,
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
-  roleText: { fontSize: 10, fontWeight: '700', color: colors.flame[400], textTransform: 'uppercase', letterSpacing: 1.5 },
-  section: { gap: 1, backgroundColor: colors.onyx[700] },
-  sectionLabel: {
-    ...typography.label,
-    color: colors.platinum[600],
-    backgroundColor: colors.onyx[900],
-    paddingBottom: spacing.sm,
+  roleText: { fontSize: 9, fontWeight: '800', color: colors.flame[400], textTransform: 'uppercase', letterSpacing: 1.5 },
+
+  sectionGroup: { gap: spacing.sm },
+  sectionLabel: { ...typography.label, color: colors.platinum[600], fontSize: 10 },
+  menuGroup: {
+    backgroundColor: colors.onyx[800],
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.onyx[700],
+    overflow: 'hidden',
   },
   menuItem: {
-    backgroundColor: colors.onyx[800],
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.md,
     gap: spacing.md,
   },
-  menuIcon: { fontSize: 20 },
-  menuText: { ...typography.body, color: colors.platinum[100], flex: 1 },
-  menuArrow: { fontSize: 20, color: colors.platinum[600] },
+  menuIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: radii.sm,
+    backgroundColor: colors.flame[500] + '1A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuText: { ...typography.body, color: colors.platinum[100], flex: 1, fontWeight: '500' },
+  divider: { height: 1, backgroundColor: colors.onyx[700], marginLeft: 58 },
+
   logoutBtn: {
     borderWidth: 1,
-    borderColor: colors.onyx[600],
+    borderColor: '#EF444433',
+    borderRadius: radii.sm,
     paddingVertical: spacing.md,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: '#EF444408',
   },
-  logoutText: { ...typography.label, color: colors.platinum[400], fontSize: 11 },
+  logoutText: { ...typography.label, color: '#EF4444', fontSize: 12 },
 });
