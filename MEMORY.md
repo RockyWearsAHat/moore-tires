@@ -1,0 +1,4 @@
+- [Caveman speak](/Users/alexwaldmann/.claude/projects/-Users-alexwaldmann-Desktop-Moore-Tires/memory/feedback_caveman_speak.md) — all chat replies use caveman speak; code/commits/docs stay normal
+- [Work until complete](/Users/alexwaldmann/.claude/projects/-Users-alexwaldmann-Desktop-Moore-Tires/memory/feedback_work_until_complete.md) — no intermediate status reports; only report once whole task done and tested
+- [Present production runs](/Users/alexwaldmann/.claude/projects/-Users-alexwaldmann-Desktop-Moore-Tires/memory/feedback_present_production_runs.md) — default "run state shown to user" uses live config; local-only is for assistant iteration only
+- [GitHub identity](/Users/alexwaldmann/.claude/projects/-Users-alexwaldmann-Desktop-Moore-Tires/memory/reference_github_org.md) — user is RockyWearsAHat; github-shell-helpers already installed in ~/bin; project repo is RockyWearsAHat/moore-tires

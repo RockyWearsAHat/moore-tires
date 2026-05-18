@@ -19,7 +19,15 @@
     "test": "vitest run --passWithNoTests",
     "clean": "rimraf dist"
   },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.0",
     "typescript": "^5.5.4",

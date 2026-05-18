@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { DashboardAuthProvider } from './context/DashboardAuthContext';
+import { ErrorBoundary, ToastContainer } from '@moore-tires/shared';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/Dashboard';
@@ -14,8 +14,8 @@ import { DistributionCentersPage } from './pages/DistributionCenters';
 
 export function App() {
   return (
-    <BrowserRouter>
-      <DashboardAuthProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
         <ProtectedRoute>
           <Routes>
             <Route element={<Layout />}>
@@ -46,7 +46,8 @@ export function App() {
             </Route>
           </Routes>
         </ProtectedRoute>
-      </DashboardAuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+      <ToastContainer />
+    </ErrorBoundary>
   );
 }

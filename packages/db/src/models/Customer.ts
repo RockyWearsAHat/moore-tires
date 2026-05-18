@@ -30,7 +30,4 @@ const CustomerSchema = new Schema<ICustomer>(
   }
 );
 
-CustomerSchema.index({ phone: 1 }, { unique: true });
-CustomerSchema.index({ email: 1 }, { sparse: true });
-
 export const Customer = model<ICustomer>('Customer', CustomerSchema);

@@ -1,5 +1,5 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useDashboardAuth } from '../context/DashboardAuthContext';
+import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '@moore-tires/shared';
 import { useEffect, useState } from 'react';
 
 /* ── Icons ─────────────────────────────────────────────── */
@@ -121,7 +121,7 @@ function initials(first?: string, last?: string) {
 
 /* ── Layout ─────────────────────────────────────────────── */
 export function Layout() {
-  const { user, logout, hasRole } = useDashboardAuth();
+  const { user, logout, hasRole } = useAuth();
   const isAdmin = hasRole('admin');
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {

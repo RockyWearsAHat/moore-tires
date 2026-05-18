@@ -1,4 +1,16 @@
-import 'dotenv/config';
+// Load env: .env.local wins over .env so a developer can override production
+// values (e.g. point at a local Mongo) without modifying the tracked Atlas .env.
+import { config as loadEnv } from 'dotenv';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const cwd = process.cwd();
+const localEnv = resolve(cwd, '.env.local');
+const rootLocalEnv = resolve(cwd, '../../.env.local');
+if (existsSync(localEnv)) loadEnv({ path: localEnv });
+if (existsSync(rootLocalEnv)) loadEnv({ path: rootLocalEnv });
+loadEnv(); // .env — fills in anything still unset
+
 import express from 'express';
 import { createServer } from 'node:http';
 import cors from 'cors';

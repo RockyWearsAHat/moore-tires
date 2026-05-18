@@ -1,4 +1,4 @@
-import { ComponentProps, useEffect, useState, useCallback } from 'react';
+import { type ComponentProps, useEffect, useState, useCallback } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';

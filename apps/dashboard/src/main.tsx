@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { AuthProvider, ToastProvider } from '@moore-tires/shared';
 import { App } from './App';
 import './index.css';
 
@@ -9,6 +10,10 @@ document.documentElement.dataset['theme'] = storedTheme === 'light' || storedThe
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <ToastProvider>
+        <App />
+      </ToastProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

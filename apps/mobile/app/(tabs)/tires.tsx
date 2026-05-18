@@ -1,4 +1,4 @@
-import { ComponentProps, useEffect, useState, useCallback } from 'react';
+import { type ComponentProps, useEffect, useState, useCallback } from 'react';
 import {
   FlatList,
   StyleSheet,

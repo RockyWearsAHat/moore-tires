@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install *)",
+      "Bash(brew list *)",
+      "Bash(docker --version)",
+      "Bash(colima version *)",
+      "Bash(brew services *)",
+      "Bash(curl -fsSL https://api.github.com/repos/RockyWearsAHat/github-shell-helpers)",
+      "Bash(node *)",
+      "Bash(MONGODB_URI=mongodb://127.0.0.1:27017/moore-tires-dev pnpm --filter @moore-tires/db seed)",
+      "Bash(MONGODB_URI=mongodb://127.0.0.1:27017/moore-tires-dev JWT_SECRET=c7670f37927b31756b6d97c4e9eeb173bffe6149e93a452d9a076a7d78ea69591701583b00a50d184b2730eb6ce268a5 JWT_REFRESH_SECRET=4c41f1d2bc3bd76e5bf792d87ac733621d7040588425f7efbbe4a5dafd81b582fe6aced31228aa1c840c66d682090d5d TWILIO_ACCOUNT_SID=ACdevdevdevdevdevdevdevdevdevdev01 TWILIO_AUTH_TOKEN=dev_local_auth_token_unused TWILIO_FROM_NUMBER=+15555550100 CORS_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175 pnpm --filter @moore-tires/api dev)",
+      "Bash(curl -fsS http://localhost:3001/health)",
+      "Bash(curl -fsS -X POST http://localhost:3001/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@mooretires.test\",\"password\":\"MooreTires!2026\"}')",
+      "Bash(curl -fsS -X POST http://localhost:3001/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"dm.acme@acmeconstruction.test\",\"password\":\"MooreTires!2026\"}')",
+      "Bash(curl -fsS -X POST http://localhost:3001/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"retail@example.test\",\"password\":\"MooreTires!2026\"}')"
+    ]
+  }
+}

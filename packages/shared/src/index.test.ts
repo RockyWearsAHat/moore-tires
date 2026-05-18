@@ -14,7 +14,6 @@ import {
   CreateTireProductSchema,
   TireProductSearchSchema,
   CreateOrderSchema,
-  CreatePricingTierSchema,
   InviteUserSchema,
   CreateWholesaleAccountSchema,
   InventoryItemSchema,
@@ -45,7 +44,7 @@ describe('RegisterSchema', () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.flatten().fieldErrors['password']).toBeDefined();
+      expect(result.error.flatten().fieldErrors.password).toBeDefined();
     }
   });
 
@@ -135,7 +134,8 @@ describe('ScheduleJobSchema', () => {
   });
 
   it('ScheduleJob_MissingTechnicianId_FailsValidation', () => {
-    const { technicianId: _, ...rest } = validBase;
+    const { technicianId: _technicianId, ...rest } = validBase;
+    void _technicianId;
     expect(ScheduleJobSchema.safeParse(rest).success).toBe(false);
   });
 
@@ -201,27 +201,27 @@ describe('ReassignJobSchema', () => {
 
 describe('JOB_STATUS_TRANSITIONS', () => {
   it('StatusMachine_ScheduledCanTransitionToEnRoute', () => {
-    expect(JOB_STATUS_TRANSITIONS['SCHEDULED']).toContain('EN_ROUTE');
+    expect(JOB_STATUS_TRANSITIONS.SCHEDULED).toContain('EN_ROUTE');
   });
 
   it('StatusMachine_ScheduledCanTransitionToCancelled', () => {
-    expect(JOB_STATUS_TRANSITIONS['SCHEDULED']).toContain('CANCELLED');
+    expect(JOB_STATUS_TRANSITIONS.SCHEDULED).toContain('CANCELLED');
   });
 
   it('StatusMachine_EnRouteCantGoBackToScheduled', () => {
-    expect(JOB_STATUS_TRANSITIONS['EN_ROUTE']).not.toContain('SCHEDULED');
+    expect(JOB_STATUS_TRANSITIONS.EN_ROUTE).not.toContain('SCHEDULED');
   });
 
   it('StatusMachine_CompleteHasNoTransitions', () => {
-    expect(JOB_STATUS_TRANSITIONS['COMPLETE']).toHaveLength(0);
+    expect(JOB_STATUS_TRANSITIONS.COMPLETE).toHaveLength(0);
   });
 
   it('StatusMachine_CancelledHasNoTransitions', () => {
-    expect(JOB_STATUS_TRANSITIONS['CANCELLED']).toHaveLength(0);
+    expect(JOB_STATUS_TRANSITIONS.CANCELLED).toHaveLength(0);
   });
 
   it('StatusMachine_InProgressCanCompleteOrCancel', () => {
-    const transitions = JOB_STATUS_TRANSITIONS['IN_PROGRESS'];
+    const transitions = JOB_STATUS_TRANSITIONS.IN_PROGRESS;
     expect(transitions).toContain('COMPLETE');
     expect(transitions).toContain('CANCELLED');
   });

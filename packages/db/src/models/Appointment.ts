@@ -35,7 +35,6 @@ const AppointmentSchema = new Schema<IAppointment>(
   }
 );
 
-AppointmentSchema.index({ jobId: 1 }, { unique: true });
 // Critical index for conflict detection: technician + time range overlap
 AppointmentSchema.index({ technicianId: 1, startsAt: 1 });
 

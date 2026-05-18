@@ -40,7 +40,6 @@ const TechnicianSchema = new Schema<ITechnician>(
   }
 );
 
-TechnicianSchema.index({ phone: 1 }, { unique: true });
 TechnicianSchema.index({ territory: 1 });
 
 export const Technician = model<ITechnician>('Technician', TechnicianSchema);

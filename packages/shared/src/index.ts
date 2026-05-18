@@ -469,3 +469,9 @@ export interface DeliveryEstimate {
   estimatedDate: string;
   distributionCenter: string;
 }
+
+// ─── React Contexts & Components ──────────────────────────────────────────────
+
+export { AuthProvider, useAuth } from './auth-context';
+export { ToastProvider, useToast, ToastContainer, type Toast, type ToastType } from './toast-context';
+export { ErrorBoundary } from './error-boundary';

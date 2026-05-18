@@ -1,7 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.js';
+import { AuthProvider } from '@moore-tires/shared';
+import { ToastProvider } from '@moore-tires/shared';
 import { CartProvider } from './context/CartContext.js';
 import { App } from './App.js';
 import './index.css';
@@ -17,9 +18,11 @@ createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

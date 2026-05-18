@@ -21,6 +21,5 @@ const RefreshTokenSchema = new Schema<IRefreshToken>(
 );
 
 RefreshTokenSchema.index({ userId: 1 });
-RefreshTokenSchema.index({ tokenHash: 1 }, { unique: true });
 
 export const RefreshToken = model<IRefreshToken>('RefreshToken', RefreshTokenSchema);

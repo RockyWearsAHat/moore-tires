@@ -55,7 +55,6 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ wholesaleAccountId: 1 });
 UserSchema.index({ storeLocationId: 1 });
 UserSchema.index({ role: 1, isActive: 1 });

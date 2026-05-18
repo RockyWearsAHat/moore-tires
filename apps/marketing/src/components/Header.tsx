@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.js';
+import { useAuth } from '@moore-tires/shared';
 import { useCart } from '../context/CartContext.js';
 import { ENABLE_SERVICE_BOOKING } from '../config/features.js';
 

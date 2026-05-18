@@ -5,12 +5,12 @@ import { colors } from '../../src/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const SCREENS: Array<{
+const SCREENS: {
   name: string;
   title: string;
   icon: IoniconName;
   iconAlt: IoniconName;
-}> = [
+}[] = [
   { name: 'index',   title: 'Home',    icon: 'home',       iconAlt: 'home-outline' },
   { name: 'tires',   title: 'Tires',   icon: 'car',        iconAlt: 'car-outline' },
   { name: 'jobs',    title: 'My Jobs', icon: 'briefcase',  iconAlt: 'briefcase-outline' },

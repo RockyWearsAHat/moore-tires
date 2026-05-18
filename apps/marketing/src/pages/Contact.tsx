@@ -20,8 +20,8 @@ export function Contact() {
   const field = (
     id: keyof typeof form,
     label: string,
-    type: string = 'text',
-    placeholder: string = ''
+    type = 'text',
+    placeholder = ''
   ) => (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="section-label">{label}</label>
@@ -97,7 +97,7 @@ export function Contact() {
                   </svg>
                 </div>
                 <h2 className="font-display text-xl font-bold text-platinum-50">Message Sent</h2>
-                <p className="mt-2 text-sm text-platinum-600">We'll reply within 2 business hours.</p>
+                <p className="mt-2 text-sm text-platinum-600">We&apos;ll reply within 2 business hours.</p>
                 <button
                   type="button"
                   onClick={() => { setStatus('idle'); setForm({ name: '', email: '', phone: '', message: '' }); }}

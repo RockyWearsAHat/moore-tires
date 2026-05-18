@@ -18,7 +18,9 @@
     "test": "turbo run test",
     "clean": "turbo run clean && rimraf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore",
-    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore"
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore",
+    "screenshot:mobile": "zsh scripts/screenshot-mobile.sh",
+    "screenshot:mobile:keep": "zsh scripts/screenshot-mobile.sh --keep-screenshots"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -35,8 +37,8 @@
   "packageManager": "pnpm@9.12.0",
   "pnpm": {
     "overrides": {
-      "react": "19.2.5",
-      "react-dom": "19.2.5"
+      "react": "19.1.0",
+      "react-dom": "19.1.0"
     }
   }
 }

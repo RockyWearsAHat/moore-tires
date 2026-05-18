@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { useDashboardAuth } from '../context/DashboardAuthContext';
+import { useAuth } from '@moore-tires/shared';
 
 export function LoginPage() {
-  const { login } = useDashboardAuth();
+  const { login } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('dashboard-theme');
     if (saved === 'light' || saved === 'dark') return saved;

@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,12 +7,12 @@ import { colors, radii, spacing, typography } from '../../src/theme';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
-const SERVICES: Array<{
+const SERVICES: {
   icon: IoniconName;
   title: string;
   desc: string;
   route: '/(tabs)/tires' | '/(tabs)/book';
-}> = [
+}[] = [
   { icon: 'cube-outline',         title: 'Wholesale',   desc: 'Bulk OTR tires for fleet accounts.',   route: '/(tabs)/tires' },
   { icon: 'flash-outline',        title: 'Quick Order', desc: 'Reorder from your purchase history.',  route: '/(tabs)/tires' },
   { icon: 'stats-chart-outline',  title: 'Inventory',   desc: 'Track stock levels, get low alerts.',  route: '/(tabs)/tires' },

@@ -22,9 +22,12 @@
   },
   "dependencies": {
     "@moore-tires/shared": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.4.5",
     "mongoose": "^8.6.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20.16.5",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.0",

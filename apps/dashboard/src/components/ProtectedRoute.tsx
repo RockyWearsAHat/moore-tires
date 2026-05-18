@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useDashboardAuth } from '../context/DashboardAuthContext';
+import { useAuth } from '@moore-tires/shared';
 import { LoginPage } from '../pages/Login';
 import type { UserRole } from '@moore-tires/shared';
 
@@ -16,7 +16,7 @@ interface ProtectedRouteProps {
  * - Rejects users whose role doesn't match allowedRoles.
  */
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { user, isLoading, hasRole } = useDashboardAuth();
+  const { user, isLoading, hasRole } = useAuth();
 
   if (isLoading) {
     return (

@@ -53,7 +53,6 @@ const JobSchema = new Schema<IJob>(
   }
 );
 
-JobSchema.index({ serviceRequestId: 1 }, { unique: true });
 JobSchema.index({ technicianId: 1, scheduledAt: 1 });
 JobSchema.index({ status: 1, scheduledAt: 1 });
 

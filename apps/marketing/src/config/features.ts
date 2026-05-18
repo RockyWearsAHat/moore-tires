@@ -1,4 +1,4 @@
-const ENABLE_BOOKING_ENV = import.meta.env['VITE_ENABLE_SERVICE_BOOKING'];
+const ENABLE_BOOKING_ENV: unknown = import.meta.env['VITE_ENABLE_SERVICE_BOOKING'];
 
 /**
  * Service booking is intentionally off by default for the wholesale-first rollout.

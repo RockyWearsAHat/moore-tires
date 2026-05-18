@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useToast } from '@moore-tires/shared';
 import { apiFetch } from '../hooks/useApi';
 import type { TireType } from '@moore-tires/shared';
 import { parseJson, type ApiResponse } from '../utils/http';
@@ -52,6 +53,7 @@ export default function Tires() {
   const [results, setResults] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
+  const { addToast } = useToast();
 
   const typeValue = searchParams.get('type');
   const typeFilter = (typeValue ?? '') as TireType | '';
@@ -226,6 +228,7 @@ export default function Tires() {
                         unitPrice: product.baseRetailPrice,
                         image: product.images[0],
                       });
+                      addToast(`Added ${product.brand} ${product.tireModel} to cart`, 'success');
                     }}
                     className="rounded-lg bg-flame-500 px-3 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-flame-600 active:scale-95"
                   >
